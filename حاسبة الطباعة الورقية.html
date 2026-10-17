@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>حاسبة الطباعة الورقية · وكالة بصمة</title>
+<style>
+:root{
+  --navy:#253C88; --cyan:#23A8E0; --orange:#F39422;
+  --ink:#1B2436; --muted:#5E6A76; --line:#D6DDE3; --soft:#EEF2F7;
+  --bg:#F4F6F9; --panel:#FFFFFF; --ok:#12925F; --warn:#B36B00; --bad:#C0392B;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:"Segoe UI",Tahoma,"IBM Plex Sans Arabic",Arial,sans-serif;font-size:15px;line-height:1.7}
+h1,h2,h3{margin:0;font-weight:700}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:14px}
+header{position:sticky;top:0;z-index:40;background:var(--navy);color:#fff;display:flex;align-items:center;gap:14px;padding:10px 18px;flex-wrap:wrap;box-shadow:0 2px 10px rgba(27,36,54,.18)}
+header .brand{font-size:18px;font-weight:700;display:flex;align-items:center;gap:9px}
+header .brand b{color:var(--cyan)}
+header .brand small{font-weight:400;opacity:.8;font-size:12px}
+header .sp{flex:1}
+header button{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:8px;padding:7px 13px;font-size:13.5px}
+header button:hover{background:rgba(255,255,255,.22)}
+nav#tabs{display:flex;gap:6px;overflow-x:auto;padding:10px 18px 0;background:var(--bg)}
+nav#tabs button{border:1px solid var(--line);background:#fff;border-radius:10px 10px 0 0;border-bottom:0;padding:9px 16px;font-size:14px;color:var(--muted);white-space:nowrap}
+nav#tabs button[aria-selected="true"]{color:var(--navy);font-weight:700;box-shadow:0 -3px 0 var(--cyan) inset}
+nav#tabs button small{display:block;font-size:10.5px;font-weight:400;opacity:.75}
+main{display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:16px;padding:16px 18px 40px;align-items:start}
+@media (max-width:1080px){main{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card>h2{font-size:16px;color:var(--navy);margin-bottom:2px}
+.card>p.sub{margin:2px 0 14px;color:var(--muted);font-size:13px}
+section#result{position:sticky;top:64px}
+@media (max-width:1080px){section#result{position:static}}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.grid2 .full,.grid3 .full{grid-column:1/-1}
+@media (max-width:640px){.grid2,.grid3{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field>label{font-size:12.5px;color:var(--muted);font-weight:600}
+.field input,.field select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink)}
+.field input:focus,.field select:focus{outline:2px solid rgba(35,168,224,.35);border-color:var(--cyan)}
+.suffix{display:flex;align-items:center;gap:6px}
+.suffix input{flex:1;min-width:0}
+.suffix span{font-size:12px;color:var(--muted);white-space:nowrap}
+.hint{font-size:11.5px;color:var(--muted)}
+.check{display:flex;align-items:center;gap:8px;font-size:13.5px;padding-top:20px}
+.check input{width:17px;height:17px}
+.seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.seg button{flex:1;border:0;background:#fff;padding:9px 6px;font-size:13px;color:var(--muted);border-inline-start:1px solid var(--line)}
+.seg button:first-child{border-inline-start:0}
+.seg button[aria-pressed="true"]{background:var(--navy);color:#fff;font-weight:700}
+.sep{height:1px;background:var(--line);margin:18px 0}
+h3.sec{font-size:14.5px;color:var(--navy);margin:16px 0 8px}
+.note{font-size:12.5px;color:var(--muted);background:var(--soft);border-radius:8px;padding:9px 11px;margin:10px 0 0}
+.extra{display:flex;gap:8px;align-items:center;margin-bottom:7px}
+.extra input[data-x="name"]{flex:1}
+.extra .suffix{width:140px}
+.xbtn{border:1px solid var(--line);background:#fff;color:var(--bad);border-radius:8px;padding:7px 10px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.kpi{background:var(--soft);border-radius:10px;padding:10px 12px;border:1px solid var(--line)}
+.kpi .l{font-size:11.5px;color:var(--muted)}
+.kpi .v{font-size:19px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+.kpi .s{font-size:11.5px;color:var(--muted)}
+.kpi.hl{background:#EAF7EF;border-color:#BFE3CE}
+.kpi.hl .v{color:var(--ok)}
+table.lines{width:100%;border-collapse:collapse;font-size:13px}
+table.lines td{padding:6px 4px;border-bottom:1px dashed var(--line);vertical-align:top}
+table.lines td.n{text-align:left;white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:600}
+table.lines tr.info td{color:var(--muted);font-size:12px}
+table.lines tr.miss td{color:var(--warn)}
+table.lines tr.tot td{border-top:2px solid var(--ink);border-bottom:0;font-weight:700;font-size:14px;color:var(--navy)}
+table.tiers{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+table.tiers th,table.tiers td{border:1px solid var(--line);padding:6px 8px;text-align:center;font-variant-numeric:tabular-nums}
+table.tiers th{background:var(--soft);font-size:12px;color:var(--muted)}
+table.tiers tr.on{background:#EAF2FD;font-weight:700}
+.warn{background:#FFF6E5;border:1px solid #F3D9A8;color:var(--warn);border-radius:9px;padding:8px 10px;font-size:12.5px;margin-top:8px}
+.desc{background:#F0F6FF;border:1px solid #CFE0F7;border-radius:9px;padding:9px 11px;font-size:13px;margin-bottom:12px}
+.actionsbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 14px;font-size:13.5px}
+.btn.primary{background:var(--navy);color:#fff;border-color:var(--navy);font-weight:700}
+.btn.ok{background:var(--ok);color:#fff;border-color:var(--ok);font-weight:700}
+dialog{border:0;border-radius:14px;padding:0;max-width:940px;width:94vw;max-height:88vh;box-shadow:0 20px 60px rgba(0,0,0,.28)}
+dialog::backdrop{background:rgba(20,28,45,.55)}
+.dlg-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;border-radius:14px 14px 0 0;z-index:2}
+.dlg-head h2{font-size:16px;color:var(--navy);flex:1}
+.dlg-body{padding:16px 18px;overflow:auto;max-height:66vh}
+.dlg-foot{padding:12px 18px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-start;position:sticky;bottom:0;background:#fff;border-radius:0 0 14px 14px}
+.listrow{display:flex;gap:8px;align-items:center;margin-bottom:7px}
+.listrow input[data-l="name"]{flex:1;min-width:0}
+.listrow .suffix{width:150px}
+.toast{position:fixed;inset-inline-start:50%;transform:translateX(50%);bottom:26px;background:var(--ink);color:#fff;padding:11px 18px;border-radius:10px;font-size:13.5px;z-index:99;opacity:0;pointer-events:none;transition:.2s}
+.toast.on{opacity:1}
+#printArea{display:none}
+@media print{
+  body{background:#fff}
+  header,nav#tabs,main,.toast,dialog{display:none !important}
+  #printArea{display:block;padding:0 8mm;font-size:13px;color:#000}
+  #printArea h1{font-size:20px;color:#253C88;margin:0}
+  #printArea .ph{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #253C88;padding-bottom:8px;margin-bottom:14px}
+  #printArea .ph .co{font-size:12px;color:#333;line-height:1.6}
+  #printArea table{width:100%;border-collapse:collapse;margin-top:10px}
+  #printArea th,#printArea td{border:1px solid #C9D2DD;padding:7px 9px;font-size:12.5px}
+  #printArea th{background:#EEF2F7;text-align:right}
+  #printArea td.n{text-align:left}
+  #printArea .tot{font-weight:700;background:#F7F9FC}
+  #printArea .ft{margin-top:16px;font-size:11.5px;color:#444;border-top:1px solid #C9D2DD;padding-top:8px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">🧾 حاسبة <b>الطباعة الورقية</b> <small>· وكالة بصمة احترافية</small></div>
+  <div class="sp"></div>
+  <button type="button" data-act="settings">⚙ أسعار الشغل</button>
+  <button type="button" data-act="backup">⬇ نسخة احتياطية</button>
+  <button type="button" data-act="restore">⬆ استعادة</button>
+  <button type="button" data-act="reset">↺ الافتراضي</button>
+</header>
+
+<nav id="tabs" role="tablist"></nav>
+
+<main>
+  <section class="card" id="formCard">
+    <h2 id="fTitle">—</h2>
+    <p class="sub" id="fSub"></p>
+    <div id="formBody"></div>
+  </section>
+  <section class="card" id="result">
+    <h2>نتيجة التسعير</h2>
+    <p class="sub">كل بند موضّح بالمعادلة — عدّل أي سعر من «أسعار الشغل».</p>
+    <div id="resBody"></div>
+  </section>
+</main>
+
+<dialog id="setDlg">
+  <div class="dlg-head"><h2>أسعار الشغل والإعدادات</h2><button class="btn" type="button" data-act="closeDlg">إغلاق</button></div>
+  <div class="dlg-body" id="setBody"></div>
+  <div class="dlg-foot">
+    <button class="btn primary" type="button" data-act="closeDlg">حفظ وإغلاق</button>
+    <button class="btn" type="button" data-act="reset">استرجاع الأسعار الافتراضية</button>
+  </div>
+</dialog>
+
+<dialog id="jsonDlg">
+  <div class="dlg-head"><h2 id="jsonTitle">نسخة احتياطية</h2><button class="btn" type="button" data-act="closeJson">إغلاق</button></div>
+  <div class="dlg-body">
+    <p class="note" id="jsonNote"></p>
+    <textarea id="jsonBox" style="width:100%;height:300px;border:1px solid var(--line);border-radius:10px;padding:10px;font-family:monospace;direction:ltr" spellcheck="false"></textarea>
+  </div>
+  <div class="dlg-foot">
+    <button class="btn primary" type="button" data-act="jsonGo" id="jsonGo">تنفيذ</button>
+    <button class="btn" type="button" data-act="closeJson">إلغاء</button>
+  </div>
+</dialog>
+
+<div class="toast" id="toast"></div>
+<div id="printArea"></div>
+
+<script id="ppEngine">
+/* =========================================================================
+   محرّك التسعير — دوال خالصة بدون اعتماد على الواجهة (قابل للاختبار مستقلاً)
+   ========================================================================= */
+var PPC = (function () {
+  var num = function (v) { var n = parseFloat(v); return isFinite(n) ? n : 0; };
+  var r2 = function (v) { var n = Number(v) || 0; return Math.round((n + (n < 0 ? -Number.EPSILON : Number.EPSILON)) * 100) / 100; };
+  var fmt = function (n, d) { d = (d == null) ? 2 : d; return r2(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: d }); };
+  var ceil = function (x) { return Math.ceil(x - 1e-9); };
+
+  /* ---------- الافتراضيات (مبنية على أسعار بصمة CRM الفعلية) ---------- */
+  var DEF = {
+    /* الفُرَخ: لكل فرخ مقاسه وسعر ضغطة الطباعة (الديجيتال أغلى من الأوفست) */
+    sheets: [
+      { name: 'ديجيتال 45×32', L: 45, W: 32, edge: 0.5, bleed: 0.3, clickColor: 0.60, clickBw: 0.15, plate: 0, longL: 66, longW: 32, longClick: 2 },
+      { name: 'أوفست 70×100', L: 70, W: 100, edge: 0.5, bleed: 0.3, clickColor: 0.08, clickBw: 0.03, plate: 25, longL: 0, longW: 0, longClick: 1 },
+      { name: 'أوفست 50×70', L: 50, W: 70, edge: 0.5, bleed: 0.3, clickColor: 0.10, clickBw: 0.04, plate: 22, longL: 0, longW: 0, longClick: 1 }
+    ],
+    /* أساس سعر الورق: سعر الفرخ المرجعي، ويتحجّم تلقائياً مع مقاس الفرخ المختار */
+    refL: 45, refW: 32,
+    papers: [
+      { name: 'ورق 80 جرام', price: 0.12, gsm: 80 },
+      { name: 'ورق 100 جرام', price: 0.20, gsm: 100 },
+      { name: 'كوشيه 150 جرام', price: 0.35, gsm: 150 },
+      { name: 'كوشيه 200 جرام', price: 0.50, gsm: 200 },
+      { name: 'كوشيه 250 جرام', price: 0.65, gsm: 250 },
+      { name: 'كرتون 300 جرام', price: 0.80, gsm: 300 },
+      { name: 'كرتون 350 جرام', price: 0.95, gsm: 350 },
+      { name: 'دوبلكس 350 جرام', price: 1.10, gsm: 350 },
+      { name: 'دوبلكس 400 جرام', price: 1.30, gsm: 400 },
+      { name: 'ورق كرافت 120 جرام', price: 0.45, gsm: 120 },
+      { name: 'ورق استيكر', price: 1.00, gsm: 0 }
+    ],
+    click: { color: 0.60, bw: 0.15 },
+    lams: [
+      { name: 'سلوفان مطفي', price: 0.60 },
+      { name: 'سلوفان لامع', price: 0.60 },
+      { name: 'سلوفان ناعم (Soft touch)', price: 0.90 }
+    ],
+    handles: [
+      { name: 'بدون إضافة (يد مقطوعة)', price: 0 },
+      { name: 'يد حبل ورقي', price: 0.30 },
+      { name: 'يد شريطة قماش', price: 0.60 },
+      { name: 'يد مسطحة ملصقة', price: 0.25 }
+    ],
+    binds: [
+      { name: 'دبوس (تدبيس)', price: 1.00 },
+      { name: 'تجليد سلك', price: 6.00 },
+      { name: 'تجليد برش (غراء حراري)', price: 8.00 },
+      { name: 'تجليد هاردكفر', price: 25.00 }
+    ],
+    cutJob: 15, setup: 10, fold: 0.05, corners: 0.05,
+    crease: 0.08, diePerPiece: 0.25, dieMold: 250, gluePerPiece: 0.15, magnetPrice: 0.75,
+    bagSetup: 150, baseBoard: 0.40,
+    /* ---------- علب الهارد كفر — نموذج حاسبة الإكسل المعتمدة (ورقة «التكاليف») ---------- */
+    boxCost: {
+      board: 8, wrapPaper: 6, print: 8, lam: 4, lining: 6, innerPrint: 8, fabric: 10,
+      eva: 2.5, divider: 0.75, magnet: 0.75, ribbon: 2.5,
+      foil: 1.25, emboss: 0.75, uv: 1,
+      assembly: 6.5, qc: 1, glue: 0.8, packUnit: 1.2, cut: 1.25, otherSvc: 0,
+      fDesign: 250, fSample: 150, fPrintSetup: 150, fDie: 200,
+      fFoilDie: 180, fEmbossDie: 150, fUvSetup: 150, fDelivery: 75, fOther: 0,
+      overheadPct: 0.15, commissionPct: 0, marginPct: 0.30, vat: 0.15
+    },
+    waste: 0.075, marginDefault: 0.30, minOrder: 50, vat: 0.15, turnIn: 2, validDays: 7,
+    tiers: [
+      { min: 1, margin: 1.50 }, { min: 2, margin: 0.75 }, { min: 11, margin: 0.50 },
+      { min: 51, margin: 0.35 }, { min: 101, margin: 0.20 }
+    ],
+    company: {
+      name: 'وكالة بصمة احترافية للدعاية والإعلان',
+      phone: '0582108652', vatNo: '310246678300003',
+      address: 'الرياض – حي المحمدية – طريق الملك عبدالله'
+    }
+  };
+
+  var TIERQ = {
+    sheet: [100, 250, 500, 1000, 2000],
+    book: [10, 25, 50, 100, 200],
+    bag: [100, 250, 500, 1000, 2000],
+    box: [50, 100, 250, 500, 1000],
+    folder: [50, 100, 250, 500, 1000],
+    hard: [25, 50, 100, 250, 500]
+  };
+
+  function settings(user) {
+    var S = JSON.parse(JSON.stringify(DEF));
+    if (user && typeof user === 'object') {
+      Object.keys(user).forEach(function (k) {
+        var v = user[k];
+        if (v == null) return;
+        if (Array.isArray(v)) { if (v.length) S[k] = JSON.parse(JSON.stringify(v)); }
+        else if (typeof v === 'object') { S[k] = Object.assign({}, S[k] || {}, v); }
+        else S[k] = v;
+      });
+    }
+    if (!Array.isArray(S.sheets) || !S.sheets.length) S.sheets = JSON.parse(JSON.stringify(DEF.sheets));
+    if (!Array.isArray(S.papers) || !S.papers.length) S.papers = JSON.parse(JSON.stringify(DEF.papers));
+    if (!Array.isArray(S.tiers) || !S.tiers.length) S.tiers = JSON.parse(JSON.stringify(DEF.tiers));
+    S.tiers = S.tiers.slice().sort(function (a, b) { return num(a.min) - num(b.min); });
+    S.sheets.forEach(function (sh) {
+      if (sh.edge == null) sh.edge = 0.5; if (sh.bleed == null) sh.bleed = 0.3;
+      if (sh.clickColor == null) sh.clickColor = num(S.click.color);
+      if (sh.clickBw == null) sh.clickBw = num(S.click.bw);
+      if (sh.plate == null) sh.plate = 0;
+      if (sh.longClick == null) sh.longClick = 1;
+    });
+    return S;
+  }
+
+  var sheetOf = function (S, name) {
+    var list = S.sheets || [];
+    return list.filter(function (s) { return s.name === name; })[0] || list[0] || DEF.sheets[0];
+  };
+  /* معامل تحجيم سعر الورق/السلوفان من الفرخ المرجعي إلى الفرخ المختار */
+  function priceScale(sh, S) {
+    var ref = Math.max(0.0001, num(S.refL) * num(S.refW));
+    return (num(sh.L) * num(sh.W)) / ref;
+  }
+  var clickOf = function (sh, S, color) {
+    var v = (color === 'bw') ? sh.clickBw : sh.clickColor;
+    if (v == null || v === '') v = (color === 'bw') ? S.click.bw : S.click.color;
+    return num(v);
+  };
+  function piecesFor(w, h, sh) {
+    var U1 = num(sh.L) - 2 * num(sh.edge), U2 = num(sh.W) - 2 * num(sh.edge);
+    var a = num(w) + 2 * num(sh.bleed), b = num(h) + 2 * num(sh.bleed);
+    if (a <= 0 || b <= 0 || U1 <= 0 || U2 <= 0) return 0;
+    return Math.max(Math.floor(U1 / a) * Math.floor(U2 / b), Math.floor(U1 / b) * Math.floor(U2 / a));
+  }
+  /* حساب الفُرَخ لقطعة واحدة أو أكثر — ولو ما دخلت في الفرخ يحسب بالمساحة (فرخ أكبر/رول) */
+  function sheetsFor(qty, bw, bh, cnt, sh, S) {
+    var n = num(qty) * (cnt || 1), w = 1 + num(S.waste), pps = piecesFor(bw, bh, sh);
+    if (pps > 0) return { pps: pps, sheets: ceil(n / pps * w), byArea: false };
+    var usable = Math.max(0.0001, (num(sh.L) - 2 * num(sh.edge)) * (num(sh.W) - 2 * num(sh.edge)));
+    var blank = (num(bw) + 2 * num(sh.bleed)) * (num(bh) + 2 * num(sh.bleed));
+    if (blank <= 0 || n <= 0) return { pps: 0, sheets: 0, byArea: false };
+    return { pps: 0, sheets: ceil(n * blank / usable * w), byArea: true };
+  }
+  var paperRow = function (S, name) { return (S.papers || []).filter(function (p) { return p.name === name; })[0]; };
+  var lamRow = function (S, name) { return (S.lams || []).filter(function (l) { return l.name === name; })[0]; };
+  var handleRow = function (S, name) { return (S.handles || []).filter(function (h) { return h.name === name; })[0]; };
+  var bindRow = function (S, name) { return (S.binds || []).filter(function (b) { return b.name === name; })[0]; };
+
+  function marginOf(c, S) {
+    if (c.marginMode === 'manual' && c.margin !== '' && c.margin != null) return num(c.margin);
+    var m = num(S.marginDefault), q = num(c.qty);
+    (S.tiers || []).forEach(function (t) { if (q >= num(t.min)) m = num(t.margin); });
+    return m;
+  }
+
+  function finish(kind, c, S, ctx) {
+    var q = ctx.qty, cost = ctx.cost, lines = ctx.lines, warn = ctx.warn;
+    var supUnit = num(c.supplierUnit), supTotal = supUnit * q, supUsed = false;
+    var mode = c.costMode === 'buy' ? 'buy' : 'make';
+    if (mode === 'buy') {
+      if (supUnit > 0 && q > 0) {
+        cost = supTotal; supUsed = true;
+        lines.push({ t: 'شراء جاهز من المورد (تكلفة الطلب)', f: fmt(supUnit) + ' × ' + fmt(q, 0), v: supTotal });
+      } else {
+        warn.push('اخترت «شراء جاهز من المورد» بدون إدخال السعر — تم الحساب على تكلفة التصنيع.');
+        lines.push({ t: 'شراء من المورد — بدون سعر مُدخل، تم استخدام تكلفة التصنيع', v: null, info: true });
+      }
+    } else if (supUnit > 0 && q > 0) {
+      lines.push({
+        t: 'سعر المورد للمقارنة',
+        f: fmt(supUnit) + ' × ' + fmt(q, 0) + ' = ' + fmt(supTotal) + (supTotal < cost ? ' (أرخص من تصنيعك ✓)' : ' (أغلى من تصنيعك)'),
+        v: null, info: true
+      });
+    }
+    var m = marginOf(c, S), calc = cost * (1 + m), minO = num(S.minOrder);
+    var final = (cost > 0 && calc < minO) ? minO : calc;
+    return {
+      kind: kind, qty: q, lines: lines, warn: warn, mode: mode,
+      cost: r2(cost), calcCost: r2(ctx.cost), margin: m,
+      final: r2(final), calcFinal: r2(calc), profit: r2(final - cost),
+      raised: final > calc + 1e-9, supTotal: r2(supTotal), supUsed: supUsed,
+      unit: q ? r2(final / q) : 0, unitCost: q ? r2(cost / q) : 0,
+      meta: ctx.meta || {}
+    };
+  }
+
+  function extrasLines(list, q, lines, cost) {
+    (list || []).forEach(function (x) {
+      var p = num(x.price);
+      if (!x.name && !p) return;
+      lines.push({ t: (x.name || 'إضافة') + ' (للحبة)', f: fmt(q, 0) + ' × ' + fmt(p), v: q * p });
+      cost += q * p;
+    });
+    return cost;
+  }
+  /* الزنكات (تُحسب للأوفست فقط): ملون = 4 ألوان، أبيض وأسود = لون واحد */
+  function plateLine(sh, S, color, sides, lines, cost) {
+    if (!num(sh.plate) || !sides) return cost;
+    var colors = color === 'bw' ? 1 : 4, n = colors * sides;
+    lines.push({ t: 'زنكات الطباعة (' + colors + (colors > 1 ? ' ألوان' : ' لون') + ' × ' + sides + ' وجه)', f: n + ' زنكة × ' + fmt(sh.plate), v: n * num(sh.plate) });
+    return cost + n * num(sh.plate);
+  }
+  function printLine(sh, S, color, sides, sheets, lines, cost, extraF) {
+    var cl = clickOf(sh, S, color) * (extraF || 1);
+    var lab = 'طباعة ' + (color === 'bw' ? 'أبيض وأسود' : 'ملونة') + ' ' + (sides === 2 ? 'وجهين' : 'وجه') + ' (' + sh.name + ')';
+    lines.push({ t: lab, f: fmt(sheets, 0) + ' × ' + sides + ' × ' + fmt(cl), v: sheets * sides * cl });
+    cost += sheets * sides * cl;
+    return plateLine(sh, S, color, sides, lines, cost);
+  }
+  function areaWarn(warn, name, w, h, sh) {
+    warn.push(name + ' (' + fmt(w, 1) + '×' + fmt(h, 1) + ' سم) أكبر من فرخ ' + sh.name + ' — الحساب بالمساحة (يحتاج فرخ أكبر أو رول).');
+  }
+
+  /* ========================= 1) مطبوعات ورقية ========================= */
+  function computeSheet(c, S) {
+    var q = Math.max(0, Math.round(num(c.qty))), lines = [], warn = [], cost = 0;
+    var sh = sheetOf(S, c.sheet), PS = priceScale(sh, S);
+    var R = sheetsFor(q, c.L, c.W, 1, sh, S);
+    var sides = num(c.sides) === 2 ? 2 : 1;
+    if (R.byArea) areaWarn(warn, 'المقاس', c.L, c.W, sh);
+    var pr = paperRow(S, c.paper), pu = pr ? num(pr.price) * PS : 0;
+    lines.push({ t: 'القطع في الفرخ', f: (R.pps ? fmt(R.pps, 0) + ' قطعة' : 'لا يدخل — حساب بالمساحة') + ' من ' + sh.name, info: true });
+    lines.push({ t: 'الورق ' + (c.paper || ''), f: fmt(R.sheets, 0) + ' فرخ × ' + fmt(pu) + ' (هالك ' + fmt(num(S.waste) * 100, 0) + '%)', v: R.sheets * pu, miss: !pu });
+    cost += R.sheets * pu;
+    cost = printLine(sh, S, c.color, sides, R.sheets, lines, cost);
+    var lam = lamRow(S, c.lam), ls = num(c.lamSides) === 2 ? 2 : 1;
+    if (lam) { var lu = num(lam.price) * PS; lines.push({ t: lam.name + ' ' + (ls === 2 ? 'وجهين' : 'وجه'), f: fmt(R.sheets, 0) + ' × ' + ls + ' × ' + fmt(lu), v: R.sheets * ls * lu }); cost += R.sheets * ls * lu; }
+    if (R.pps > 1 || num(c.L) < num(sh.W) || R.byArea) { lines.push({ t: 'قص بالمقصلة', f: 'للطلب', v: num(S.cutJob) }); cost += num(S.cutJob); }
+    var folds = Math.round(num(c.folds));
+    if (folds > 0) {
+      var ftxt = folds === 1 ? 'طي واحد (ثنائي)' : folds === 2 ? 'طي اثنين (ثلاثي)' : 'طي ' + folds + ' (' + (folds + 1) + ' طيات)';
+      lines.push({ t: ftxt, f: fmt(q, 0) + ' × ' + folds + ' × ' + fmt(S.fold), v: q * folds * num(S.fold) });
+      cost += q * folds * num(S.fold);
+    }
+    if (c.corners) { lines.push({ t: 'قص زوايا دائري', f: fmt(q, 0) + ' × ' + fmt(S.corners), v: q * num(S.corners) }); cost += q * num(S.corners); }
+    cost = extrasLines(c.extras, q, lines, cost);
+    if (num(S.setup)) { lines.push({ t: 'تجهيز الملف والماكينة', f: 'للطلب', v: num(S.setup) }); cost += num(S.setup); }
+    return finish('sheet', c, S, { qty: q, cost: cost, lines: lines, warn: warn, meta: { pps: R.pps, sheets: R.sheets, byArea: R.byArea, sheet: sh.name } });
+  }
+
+  /* ========================= 2) كتب وكتيبات ========================= */
+  function computeBook(c, S) {
+    var q = Math.max(0, Math.round(num(c.qty))), lines = [], warn = [], cost = 0;
+    var sh = sheetOf(S, c.sheet), PS = priceScale(sh, S);
+    var pages = Math.max(0, Math.round(num(c.pages)));
+    var staple = /دبوس|تدبيس/.test(c.bind || '');
+    if (staple && pages % 4) { pages += 4 - (pages % 4); warn.push('التدبيس يحتاج عدد صفحات من مضاعفات 4 — الحساب على ' + fmt(pages, 0) + ' صفحة.'); }
+    var ppsIn = piecesFor(c.L, c.W, sh);
+    var perCopy = ppsIn ? ceil(pages / (ppsIn * 2)) : ceil(pages / 2);
+    if (!ppsIn && num(c.L)) warn.push('مقاس الصفحة أكبر من فرخ ' + sh.name + ' — الحساب على صفحة واحدة لكل وجه.');
+    var innerSheets = ceil(perCopy * q * (1 + num(S.waste)));
+    var pr = paperRow(S, c.paper), pu = pr ? num(pr.price) * PS : 0;
+    lines.push({ t: 'الداخلي', f: fmt(pages, 0) + ' صفحة · ' + fmt(ppsIn * 2, 0) + ' صفحة في الفرخ وجهين · ' + fmt(perCopy, 0) + ' فرخ للنسخة · ' + fmt(innerSheets, 0) + ' فرخ إجمالاً', info: true });
+    lines.push({ t: 'ورق الداخلي ' + (c.paper || ''), f: fmt(innerSheets, 0) + ' × ' + fmt(pu), v: innerSheets * pu, miss: !pu });
+    cost += innerSheets * pu;
+    cost = printLine(sh, S, c.color, 2, innerSheets, lines, cost);
+    /* الغلاف */
+    var gsm = num((String(c.coverPaper || '').match(/(\d+)\s*جرام/) || [0, 250])[1]);
+    var thick = /حراري|غراء|هاردكفر|برش/.test(c.bind || '') ? ceil(pages / 2) * gsm * 0.00011 : 0;
+    var cw = 2 * num(c.W) + thick;
+    var wire = /سلك/.test(c.bind || '');
+    var cuS = piecesFor(cw, c.L, sh);
+    var hasLong = num(sh.longL) > 0 && num(sh.longW) > 0;
+    var cuL = (!wire && !cuS && hasLong) ? piecesFor(cw, c.L, { L: sh.longL, W: sh.longW, edge: sh.edge, bleed: sh.bleed }) : 0;
+    var long = cuL > 0;
+    var split = wire || (!cuS && !long);
+    var cu = split ? piecesFor(c.W, c.L, sh) : (long ? cuL : cuS);
+    var coverSheets = cu ? ceil((split ? 2 * q : q) / cu * (1 + num(S.waste))) : 0;
+    if (!cu) {
+      var shU = long ? { L: sh.longL, W: sh.longW, edge: sh.edge, bleed: sh.bleed } : sh;
+      var usable = Math.max(0.0001, (num(shU.L) - 2 * num(shU.edge)) * (num(shU.W) - 2 * num(shU.edge)));
+      coverSheets = ceil((split ? 2 * q : q) * (cw + 2 * num(shU.bleed)) * (num(c.L) + 2 * num(shU.bleed)) / usable * (1 + num(S.waste)));
+      warn.push('الغلاف المفرود ' + fmt(cw, 1) + ' سم أكبر من الفُرَخ المتاحة — الحساب بالمساحة.');
+    }
+    var areaF = long ? (num(sh.longL) * num(sh.longW)) / Math.max(0.0001, num(sh.L) * num(sh.W)) : 1;
+    var clickF = long ? (num(sh.longClick) || 1) : 1;
+    var label = split ? ('الغلاف قطعتين ' + fmt(num(c.W), 1) + '×' + fmt(num(c.L), 1) + ' سم')
+      : ('الغلاف مفرود ' + fmt(cw, 1) + '×' + fmt(num(c.L), 1) + ' سم' + (thick ? ' (كعب ' + fmt(thick, 1) + ' سم)' : '') + (long ? ' على الفرخ الطويل' : ''));
+    lines.push({ t: label, f: fmt(cu, 0) + ' في الفرخ · ' + fmt(coverSheets, 0) + ' فرخ', info: true });
+    if (split && !wire && /حراري|غراء|هاردكفر|برش|دبوس|تدبيس/.test(c.bind || '')) warn.push('الغلاف المفرود أكبر من الفرخ الطويل أيضاً — الحساب على قطعتين منفصلتين.');
+    var cr = paperRow(S, c.coverPaper), cpu = (cr ? num(cr.price) : 0) * PS * areaF;
+    lines.push({ t: 'ورق الغلاف ' + (c.coverPaper || ''), f: fmt(coverSheets, 0) + ' × ' + fmt(cpu) + (long ? ' (الفرخ الطويل)' : ''), v: coverSheets * cpu, miss: !cpu });
+    cost += coverSheets * cpu;
+    var csides = num(c.coverSides) === 2 ? 2 : 1;
+    var ccl = clickOf(sh, S, c.coverColor) * clickF;
+    lines.push({ t: 'طباعة الغلاف ' + (c.coverColor === 'bw' ? 'أبيض وأسود' : 'ملون') + ' ' + (csides === 2 ? 'وجهين' : 'وجه'), f: fmt(coverSheets, 0) + ' × ' + csides + ' × ' + fmt(ccl) + (long ? ' × ' + fmt(clickF, 0) : ''), v: coverSheets * csides * ccl });
+    cost += coverSheets * csides * ccl;
+    if (num(sh.plate)) { var pn = (c.coverColor === 'bw' ? 1 : 4) * csides; lines.push({ t: 'زنكات الغلاف', f: pn + ' زنكة × ' + fmt(sh.plate), v: pn * num(sh.plate) }); cost += pn * num(sh.plate); }
+    var clam = c.lam ? lamRow(S, c.lam) : null;
+    if (clam) { var clu = num(clam.price) * PS * areaF; lines.push({ t: clam.name + ' للغلاف', f: fmt(coverSheets, 0) + ' × ' + fmt(clu), v: coverSheets * clu }); cost += coverSheets * clu; }
+    var br = bindRow(S, c.bind);
+    if (c.bind) { lines.push({ t: c.bind, f: fmt(q, 0) + ' × ' + fmt(br ? num(br.price) : 0), v: (br ? num(br.price) : 0) * q, miss: !br || !num(br.price) }); cost += (br ? num(br.price) : 0) * q; }
+    lines.push({ t: 'قص وتشذيب', f: 'للطلب', v: num(S.cutJob) }); cost += num(S.cutJob);
+    if (c.corners) { lines.push({ t: 'قص زوايا دائري', f: fmt(q, 0) + ' × ' + fmt(S.corners), v: q * num(S.corners) }); cost += q * num(S.corners); }
+    cost = extrasLines(c.extras, q, lines, cost);
+    if (num(S.setup)) { lines.push({ t: 'تجهيز الملف والماكينة', f: 'للطلب', v: num(S.setup) }); cost += num(S.setup); }
+    return finish('book', c, S, { qty: q, cost: cost, lines: lines, warn: warn, meta: { pages: pages, innerSheets: innerSheets, coverSheets: coverSheets, sheets: innerSheets + coverSheets, long: long, split: split, sheet: sh.name } });
+  }
+
+  /* ========================= 3) أكياس ورقية (مقاسات حرة) ========================= */
+  function bagBlank(c) {
+    var glue = 1.5, top = num(c.topFold), bot = num(c.bottom);
+    return { w: 2 * (num(c.W) + num(c.G)) + glue, h: num(c.H) + top + bot, glue: glue, top: top, bot: bot };
+  }
+  function computeBag(c, S) {
+    var q = Math.max(0, Math.round(num(c.qty))), lines = [], warn = [], cost = 0;
+    var sh = sheetOf(S, c.sheet), PS = priceScale(sh, S);
+    var B = bagBlank(c), R = sheetsFor(q, B.w, B.h, 1, sh, S);
+    lines.push({ t: 'فرخ الكيس المفرود', f: fmt(B.w, 1) + ' × ' + fmt(B.h, 1) + ' سم (2×(عرض+بطن) + ' + fmt(B.glue, 1) + ' لسان لحام · طول + ' + fmt(B.top, 1) + ' طية علوية + ' + fmt(B.bot, 1) + ' قاعدة)', info: true });
+    lines.push({ t: 'القطع في الفرخ', f: (R.pps ? fmt(R.pps, 0) + ' كيس' : 'لا يدخل — حساب بالمساحة') + ' من ' + sh.name, info: true });
+    if (R.byArea) areaWarn(warn, 'فرخ الكيس', B.w, B.h, sh);
+    var pr = paperRow(S, c.paper), pu = pr ? num(pr.price) * PS : 0;
+    lines.push({ t: 'الورق ' + (c.paper || ''), f: fmt(R.sheets, 0) + ' فرخ × ' + fmt(pu) + ' (هالك ' + fmt(num(S.waste) * 100, 0) + '%)', v: R.sheets * pu, miss: !pu });
+    cost += R.sheets * pu;
+    var sides = num(c.sides) === 2 ? 2 : 1;
+    cost = printLine(sh, S, c.color, sides, R.sheets, lines, cost);
+    var lam = c.lam ? lamRow(S, c.lam) : null, ls = num(c.lamSides) === 2 ? 2 : 1;
+    if (lam) { var lu = num(lam.price) * PS; lines.push({ t: lam.name + ' ' + (ls === 2 ? 'وجهين' : 'وجه'), f: fmt(R.sheets, 0) + ' × ' + ls + ' × ' + fmt(lu), v: R.sheets * ls * lu }); cost += R.sheets * ls * lu; }
+    var hr = c.handle ? handleRow(S, c.handle) : null;
+    if (hr && num(hr.price)) { lines.push({ t: hr.name, f: fmt(q, 0) + ' × ' + fmt(hr.price), v: q * num(hr.price) }); cost += q * num(hr.price); }
+    if (c.reinforce) { lines.push({ t: 'تقوية القاعدة (كرتون)', f: fmt(q, 0) + ' × ' + fmt(S.baseBoard), v: q * num(S.baseBoard) }); cost += q * num(S.baseBoard); }
+    if (c.glueBag) { lines.push({ t: 'لزق وتجميع الكيس', f: fmt(q, 0) + ' × ' + fmt(S.gluePerPiece), v: q * num(S.gluePerPiece) }); cost += q * num(S.gluePerPiece); }
+    cost = extrasLines(c.extras, q, lines, cost);
+    if (num(S.bagSetup)) { lines.push({ t: 'تجهيز طباعة الأكياس (كليشة/أفلام)', f: 'للطلب', v: num(S.bagSetup) }); cost += num(S.bagSetup); }
+    return finish('bag', c, S, { qty: q, cost: cost, lines: lines, warn: warn, meta: { blankW: B.w, blankH: B.h, pps: R.pps, sheets: R.sheets, byArea: R.byArea, sheet: sh.name } });
+  }
+
+  /* ========================= 4) بوكسات الكرتون ========================= */
+  function boxParts(c) {
+    if (c.manualBlank) return [{ n: 'القطعة (مقاس يدوي)', w: num(c.blankW), h: num(c.blankH), cnt: 1 }];
+    var L = num(c.L), W = num(c.W), H = num(c.H), g = 1.5, t = c.boxType, out = [];
+    if (t === 'tuck') {
+      out.push({ n: 'جسم البوكس (كيس)', w: 2 * (L + W) + g, h: H + W + 1, cnt: 1 });
+    } else if (t === 'lidbase') {
+      var hb = num(c.wallH) || H, hg = num(c.lidH) || Math.max(1, H * 0.35);
+      out.push({ n: 'القاعدة', w: L + 2 * hb + g, h: W + 2 * hb + g, cnt: 1 });
+      out.push({ n: 'الغطاء', w: L + 0.4 + 2 * hg + g, h: W + 0.4 + 2 * hg + g, cnt: 1 });
+    } else if (t === 'drawer') {
+      var ht = num(c.wallH) || H, hs = num(c.sleeveH) || (H + 0.4);
+      out.push({ n: 'الدرج', w: L + 2 * ht + g, h: W + 2 * ht + g, cnt: 1 });
+      out.push({ n: 'الكم (الغلاف الخارجي)', w: 2 * (W + hs) + 3, h: L + 1, cnt: 1 });
+    } else if (t === 'magnet') {
+      out.push({ n: 'جسم البوكس (لفّة كاملة)', w: 2 * (W + H) + 3, h: L + 3, cnt: 1 });
+      var hm = Math.max(0.6, H - 0.5);
+      out.push({ n: 'الدرج الداخلي', w: (L - 0.6) + 2 * hm + g, h: (W - 0.6) + 2 * hm + g, cnt: 1 });
+    }
+    return out.filter(function (p) { return p.w > 0 && p.h > 0; });
+  }
+  function boxCreases(t) { return t === 'tuck' ? 4 : t === 'lidbase' ? 8 : t === 'drawer' ? 8 : t === 'magnet' ? 6 : 4; }
+  function computeBox(c, S) {
+    var q = Math.max(0, Math.round(num(c.qty))), lines = [], warn = [], cost = 0;
+    var sh = sheetOf(S, c.sheet), PS = priceScale(sh, S);
+    var parts = boxParts(c), sheets = 0;
+    if (!parts.length) warn.push('أدخل مقاسات البوكس أو فعّل «مقاس يدوي».');
+    parts.forEach(function (p) {
+      var R = sheetsFor(q, p.w, p.h, p.cnt, sh, S);
+      sheets += R.sheets;
+      lines.push({ t: p.n + ' — ' + fmt(p.w, 1) + '×' + fmt(p.h, 1) + ' سم', f: (R.pps ? fmt(R.pps, 0) + ' في الفرخ' : 'لا يدخل — بالمساحة') + ' · ' + fmt(R.sheets, 0) + ' فرخ', info: true });
+      if (R.byArea) areaWarn(warn, p.n, p.w, p.h, sh);
+    });
+    var pr = paperRow(S, c.paper), pu = pr ? num(pr.price) * PS : 0;
+    lines.push({ t: 'الكرتون ' + (c.paper || ''), f: fmt(sheets, 0) + ' فرخ × ' + fmt(pu) + ' (هالك ' + fmt(num(S.waste) * 100, 0) + '%)', v: sheets * pu, miss: !pu });
+    cost += sheets * pu;
+    var sides = num(c.sides) === 2 ? 2 : 1;
+    cost = printLine(sh, S, c.color, sides, sheets, lines, cost);
+    var lam = c.lam ? lamRow(S, c.lam) : null, ls = num(c.lamSides) === 2 ? 2 : 1;
+    if (lam) { var lu = num(lam.price) * PS; lines.push({ t: lam.name + ' ' + (ls === 2 ? 'وجهين' : 'وجه'), f: fmt(sheets, 0) + ' × ' + ls + ' × ' + fmt(lu), v: sheets * ls * lu }); cost += sheets * ls * lu; }
+    var cr = num(c.creases) > 0 ? Math.round(num(c.creases)) : boxCreases(c.boxType);
+    if (num(S.crease) && cr) { lines.push({ t: 'تكسير ' + fmt(cr, 0) + ' خط', f: fmt(q, 0) + ' × ' + fmt(cr, 0) + ' × ' + fmt(S.crease), v: q * cr * num(S.crease) }); cost += q * cr * num(S.crease); }
+    if (num(S.diePerPiece)) { lines.push({ t: 'قص بالقالب', f: fmt(q, 0) + ' × ' + fmt(S.diePerPiece), v: q * num(S.diePerPiece) }); cost += q * num(S.diePerPiece); }
+    if (c.dieMold && num(S.dieMold)) { lines.push({ t: 'قالب / كليشة (مرة واحدة)', f: 'للطلب', v: num(S.dieMold) }); cost += num(S.dieMold); }
+    if (c.boxType === 'magnet') { lines.push({ t: 'مغناطيس (قطعتان)', f: fmt(q, 0) + ' × 2 × ' + fmt(S.magnetPrice), v: q * 2 * num(S.magnetPrice) }); cost += q * 2 * num(S.magnetPrice); }
+    if (c.glue) { lines.push({ t: 'لزق وتجميع', f: fmt(q, 0) + ' × ' + fmt(S.gluePerPiece), v: q * num(S.gluePerPiece) }); cost += q * num(S.gluePerPiece); }
+    if (num(S.cutJob) && parts.length > 1) { lines.push({ t: 'قص بالمقصلة للأجزاء', f: 'للطلب', v: num(S.cutJob) }); cost += num(S.cutJob); }
+    cost = extrasLines(c.extras, q, lines, cost);
+    if (num(S.setup)) { lines.push({ t: 'تجهيز الملف والماكينة', f: 'للطلب', v: num(S.setup) }); cost += num(S.setup); }
+    return finish('box', c, S, { qty: q, cost: cost, lines: lines, warn: warn, meta: { sheets: sheets, parts: parts, sheet: sh.name } });
+  }
+
+  /* ========================= 5) فولدرات (ثنائي / ثلاثي الطي) ========================= */
+  function folderParts(c) {
+    var W = num(c.W), H = num(c.H), g = 1.5;
+    var panels = c.foldType === 'tri' ? 3 : 2;
+    var out = [{ n: 'جسم الفولدر ' + (panels === 2 ? 'ثنائي الطي' : 'ثلاثي الطي'), w: panels * W + g, h: H, cnt: 1 }];
+    var np = Math.round(num(c.pockets));
+    if (np > 0) { var ph = num(c.pocketH) || H * 0.55; out.push({ n: 'جيب داخلي' + (np > 1 ? ' × ' + np : ''), w: W - 0.6, h: ph, cnt: np }); }
+    if (c.holder) out.push({ n: 'جيب/زاوية الكارت', w: 9, h: 5.5, cnt: num(c.holders) || 1 });
+    return out.filter(function (p) { return p.w > 0 && p.h > 0; });
+  }
+  function computeFolder(c, S) {
+    var q = Math.max(0, Math.round(num(c.qty))), lines = [], warn = [], cost = 0;
+    var sh = sheetOf(S, c.sheet), PS = priceScale(sh, S);
+    var parts = folderParts(c), sheets = 0;
+    if (!parts.length) warn.push('أدخل مقاس الفولدر.');
+    parts.forEach(function (p) {
+      var R = sheetsFor(q, p.w, p.h, p.cnt, sh, S);
+      sheets += R.sheets;
+      lines.push({ t: p.n + ' — ' + fmt(p.w, 1) + '×' + fmt(p.h, 1) + ' سم', f: (R.pps ? fmt(R.pps, 0) + ' في الفرخ' : 'لا يدخل — بالمساحة') + ' · ' + fmt(R.sheets, 0) + ' فرخ', info: true });
+      if (R.byArea) areaWarn(warn, p.n, p.w, p.h, sh);
+    });
+    var pr = paperRow(S, c.paper), pu = pr ? num(pr.price) * PS : 0;
+    lines.push({ t: 'الكرتون ' + (c.paper || ''), f: fmt(sheets, 0) + ' فرخ × ' + fmt(pu) + ' (هالك ' + fmt(num(S.waste) * 100, 0) + '%)', v: sheets * pu, miss: !pu });
+    cost += sheets * pu;
+    var sides = num(c.sides) === 2 ? 2 : 1;
+    cost = printLine(sh, S, c.color, sides, sheets, lines, cost);
+    var lam = c.lam ? lamRow(S, c.lam) : null, ls = num(c.lamSides) === 2 ? 2 : 1;
+    if (lam) { var lu = num(lam.price) * PS; lines.push({ t: lam.name + ' ' + (ls === 2 ? 'وجهين' : 'وجه'), f: fmt(sheets, 0) + ' × ' + ls + ' × ' + fmt(lu), v: sheets * ls * lu }); cost += sheets * ls * lu; }
+    var folds = c.foldType === 'tri' ? 2 : 1;
+    if (num(S.crease)) { lines.push({ t: 'تكسير ' + folds + ' طية', f: fmt(q, 0) + ' × ' + folds + ' × ' + fmt(S.crease), v: q * folds * num(S.crease) }); cost += q * folds * num(S.crease); }
+    if (num(S.diePerPiece)) { lines.push({ t: 'قص بالقالب (تكسير + جيوب)', f: fmt(q, 0) + ' × ' + fmt(S.diePerPiece), v: q * num(S.diePerPiece) }); cost += q * num(S.diePerPiece); }
+    if (c.dieMold && num(S.dieMold)) { lines.push({ t: 'قالب / كليشة (مرة واحدة)', f: 'للطلب', v: num(S.dieMold) }); cost += num(S.dieMold); }
+    var np = Math.round(num(c.pockets));
+    if (np > 0 && c.gluePockets) { lines.push({ t: 'لزق الجيوب', f: fmt(q, 0) + ' × ' + np + ' × ' + fmt(S.gluePerPiece), v: q * np * num(S.gluePerPiece) }); cost += q * np * num(S.gluePerPiece); }
+    if (c.corners) { lines.push({ t: 'قص زوايا دائري', f: fmt(q, 0) + ' × ' + fmt(S.corners), v: q * num(S.corners) }); cost += q * num(S.corners); }
+    cost = extrasLines(c.extras, q, lines, cost);
+    if (num(S.setup)) { lines.push({ t: 'تجهيز الملف والماكينة', f: 'للطلب', v: num(S.setup) }); cost += num(S.setup); }
+    return finish('folder', c, S, { qty: q, cost: cost, lines: lines, warn: warn, meta: { sheets: sheets, folds: folds, parts: parts, sheet: sh.name } });
+  }
+
+  /* =========================================================================
+     6) علب الهارد كفر — نموذج حاسبة الإكسل المعتمدة (حاسبة_تسعير_بوكسات_الهارد_كفر)
+     المنطق: خامات بالمتر² + تشغيل للحبة + رسوم ثابتة للطلب + تحميل غير مباشر %
+             ثم السعر = التكلفة ÷ (1 − العمولة − هامش الربح من صافي البيع)
+     ========================================================================= */
+  function boxCosts(S) { return Object.assign({}, DEF.boxCost, S.boxCost || {}); }
+
+  /* تقريب 4 خانات للقيم الصغيرة (تكلفة العلبة وسطورها) */
+  function r4(v) { var n = Number(v) || 0; return Math.round((n + (n < 0 ? -1e-9 : 1e-9)) * 10000) / 10000; }
+
+  /* استهلاك الخامات للعلبة (م²) — مطابق لمعادلات ورقة «الحاسبة» */
+  function hardAreas(c, S) {
+    var L = num(c.L), W = num(c.W), Hh = num(c.H), ld = num(c.lidDepth), a = num(c.turnIn);
+    var tray = c.boxType === 'tray';
+    var bw = 1 + num(c.boardWaste), ww = 1 + num(c.wrapWaste);
+    var boardGeo = tray
+      ? (L * W + 2 * (L + W) * Hh) / 1e4
+      : (2 * L * W + 2 * (L + W) * (Hh + ld)) / 1e4;
+    var wrapGeo = ((L + 2 * Hh + 2 * a) * (W + 2 * Hh + 2 * a)) / 1e4 +
+      (tray ? 0 : ((L + 2 * ld + 2 * a) * (W + 2 * ld + 2 * a)) / 1e4);
+    return {
+      boardGeo: boardGeo, wrapGeo: wrapGeo, tray: tray,
+      board: (boardGeo + num(c.extraBoard)) * bw,
+      wrap: (wrapGeo + num(c.extraPaper)) * ww,
+      lining: num(c.liningPaper) * ww,
+      fabric: num(c.fabricLining) * ww
+    };
+  }
+
+  /* التكلفة المتغيرة للعلبة الواحدة */
+  function hardVariable(c, S) {
+    var B = boxCosts(S), A = hardAreas(c, S), lines = [], v = 0;
+    var m2 = function (x) { return fmt(x, 4) + ' م²'; };
+    function add(t, f, val) { val = num(val); if (val) { lines.push({ t: t, f: f, v: r4(val) }); v += val; } }
+    add('لوح رمادي صلب', m2(A.board) + ' × ' + fmt(B.board) + ' ر.س/م²', A.board * num(B.board));
+    add('ورق تغليف خارجي', m2(A.wrap) + ' × ' + fmt(B.wrapPaper), A.wrap * num(B.wrapPaper));
+    add('طباعة خارجية', m2(A.wrap) + ' × ' + fmt(B.print), A.wrap * num(B.print) * num(c.outerPrint));
+    add('لامينيشن خارجي', m2(A.wrap) + ' × ' + fmt(B.lam), A.wrap * num(B.lam) * num(c.lam));
+    add('بطانة ورقية وطباعة داخلية', m2(A.lining) + ' × (' + fmt(B.lining) + (num(c.innerPrint) ? ' + ' + fmt(B.innerPrint) + ' طباعة' : '') + ')', A.lining * (num(B.lining) + num(B.innerPrint) * num(c.innerPrint)));
+    add('بطانة قماشية', m2(A.fabric) + ' × ' + fmt(B.fabric), A.fabric * num(B.fabric));
+    add('حشوات EVA أو فوم', fmt(c.eva) + ' قطعة × ' + fmt(B.eva), num(c.eva) * num(B.eva));
+    add('فواصل أو حوامل كرتونية', fmt(c.dividers) + ' قطعة × ' + fmt(B.divider), num(c.dividers) * num(B.divider));
+    add('مغناطيسات الإغلاق', fmt(c.magnets) + ' قطعة × ' + fmt(B.magnet), num(c.magnets) * num(B.magnet));
+    add('شرائط السحب أو الربط', fmt(c.ribbonM) + ' م × ' + fmt(B.ribbon), num(c.ribbonM) * num(B.ribbon));
+    add('فويل ساخن', fmt(c.foilHits) + ' موضع × ' + fmt(B.foil), num(c.foilHits) * num(B.foil));
+    add('بروز أو حفر', fmt(c.embossHits) + ' موضع × ' + fmt(B.emboss), num(c.embossHits) * num(B.emboss));
+    add('UV موضعي', fmt(c.uvHits) + ' موضع × ' + fmt(B.uv), num(c.uvHits) * num(B.uv));
+    add('تجميع يدوي', 'للعلبة', B.assembly);
+    add('فحص الجودة', 'للعلبة', B.qc);
+    add('غراء ولوازم', 'للعلبة', B.glue);
+    add('تغليف فردي أو حصة كرتون', fmt(c.packUnits) + ' وحدة × ' + fmt(B.packUnit), num(c.packUnits) * num(B.packUnit));
+    add('قص وتخديد وتحويل الهيكل', fmt(B.cut) + (num(c.extraConv) ? ' + ' + fmt(c.extraConv) : ''), num(B.cut) + num(c.extraConv));
+    add('خدمة تشغيلية أخرى', 'للعلبة', B.otherSvc);
+    return { lines: lines, v: v, areas: A, B: B };
+  }
+
+  /* الرسوم الثابتة للطلب */
+  function hardFixed(c, S) {
+    var B = boxCosts(S), lines = [], fv = 0;
+    function addF(t, val) { val = num(val); if (val) { lines.push({ t: t, v: r4(val) }); fv += val; } }
+    addF('تصميم الهيكل وتجهيز الملف', B.fDesign);
+    addF('عينة أو نموذج أولي', B.fSample);
+    addF('إعداد الطباعة أو بروفة اللون', (num(c.innerPrint) || num(c.outerPrint)) ? num(B.fPrintSetup) : 0);
+    addF('قالب قص أو إعداد هيكل', B.fDie);
+    addF('قالب الفويل', num(c.foilHits) > 0 ? num(B.fFoilDie) : 0);
+    addF('قالب البروز أو الحفر', num(c.embossHits) > 0 ? num(B.fEmbossDie) : 0);
+    addF('إعداد UV موضعي', num(c.uvHits) > 0 ? num(B.fUvSetup) : 0);
+    addF('توصيل الطلب', B.fDelivery);
+    addF('رسوم ثابتة أخرى', B.fOther);
+    return { lines: lines, fv: fv, B: B };
+  }
+
+  function hardPrice(varBox, fixed, q, B) {
+    var qq = Math.max(0, num(q));
+    var cost = (num(varBox) + (qq > 0 ? num(fixed) / qq : 0)) * (1 + num(B.overheadPct));
+    var comm = num(B.commissionPct), marg = num(B.marginPct);
+    var ok = qq > 0 && (comm + marg) < 1;
+    var price = ok ? cost / (1 - comm - marg) : 0;
+    var profit = ok ? qq * price * (1 - comm) - qq * cost : 0;
+    return { qty: qq, cost: r4(cost), price: r4(price), profit: r2(profit) };
+  }
+
+  function computeHard(c, S) {
+    var q = Math.max(0, Math.round(num(c.qty))), warn = [];
+    var V = hardVariable(c, S), F = hardFixed(c, S), B = V.B;
+    var varOrder = V.v * q;
+    var overhead = (F.fv + varOrder) * num(B.overheadPct);
+    var totalCost = F.fv + varOrder + overhead;
+    var costBox = q > 0 ? totalCost / q : 0;
+    var comm = num(B.commissionPct), marg = num(B.marginPct);
+    if (q <= 0) warn.push('أدخل كمية موجبة.');
+    if (q > 0 && (comm + marg) >= 1) warn.push('نسبة الهامش + العمولة يجب أن تكون أقل من 100%.');
+    var ready = q > 0 && (comm + marg) < 1;
+    var unit = ready ? costBox / (1 - comm - marg) : 0;
+    var manual = num(c.manualPrice) > 0;
+    if (manual) unit = num(c.manualPrice);
+    var orderNet = unit * q, commission = orderNet * comm, profit = orderNet - commission - totalCost;
+    var marginActual = orderNet ? profit / orderNet : 0;
+    var vatAmt = orderNet * num(B.vat);
+    var market = num(c.marketRef);
+    var tiers = [100, 250, 500, 1000, 2500, 5000].map(function (tq) { var r = hardPrice(V.v, F.fv, tq, B); return r; });
+    if (q > 0 && tiers.every(function (t) { return t.qty !== q; })) tiers.push(hardPrice(V.v, F.fv, q, B));
+    tiers.sort(function (a, b) { return a.qty - b.qty; });
+    return {
+      kind: 'hard', isHard: true, ready: ready, manual: manual, market: market,
+      qty: q, lines: V.lines, fixed: F.lines, warn: warn,
+      areas: V.areas, B: B,
+      variable: r2(V.v), fixedTotal: r2(F.fv), varOrder: r2(varOrder), overhead: r2(overhead),
+      totalCost: r2(totalCost), cost: r2(totalCost), costBox: r4(costBox),
+      unit: r4(unit), orderNet: r2(orderNet), commission: r2(commission), profit: r2(profit),
+      marginActual: marginActual, vatAmt: r2(vatAmt), orderGross: r2(orderNet + vatAmt),
+      tiers: tiers, final: r2(orderNet)
+    };
+  }
+
+  function compute(kind, c, S) {
+    if (!c) return null;
+    if (kind === 'sheet') return computeSheet(c, S);
+    if (kind === 'book') return computeBook(c, S);
+    if (kind === 'bag') return computeBag(c, S);
+    if (kind === 'box') return computeBox(c, S);
+    if (kind === 'folder') return computeFolder(c, S);
+    if (kind === 'hard') return computeHard(c, S);
+    return null;
+  }
+  function tierTable(kind, c, S) {
+    return (TIERQ[kind] || TIERQ.sheet).map(function (q) {
+      var r = compute(kind, Object.assign({}, c, { qty: q }), S);
+      return { qty: q, unit: r ? r.unit : 0, final: r ? r.final : 0 };
+    });
+  }
+  function blankInfo(kind, c) {
+    if (kind === 'bag') { var B = bagBlank(c); return { w: B.w, h: B.h }; }
+    if (kind === 'box') { var p = boxParts(c)[0]; return p ? { w: p.w, h: p.h } : null; }
+    if (kind === 'folder') { var f = folderParts(c)[0]; return f ? { w: f.w, h: f.h } : null; }
+    if (kind === 'sheet' || kind === 'book') return { w: num(c.W), h: num(c.L) };
+    return null;
+  }
+  function sheetNames(S) { return (S.sheets || []).map(function (s) { return s.name; }); }
+
+  function describe(kind, c, S) {
+    var parts = [], paper = c.paper || '';
+    if (kind === 'sheet') {
+      var f = Math.round(num(c.folds));
+      parts.push('مطبوعات ورقية ' + fmt(c.W, 1) + '×' + fmt(c.L, 1) + ' سم');
+      parts.push(paper);
+      parts.push('طباعة ' + (c.color === 'bw' ? 'أبيض وأسود' : 'ملونة') + ' ' + (num(c.sides) === 2 ? 'وجهين' : 'وجه'));
+      if (f) parts.push(f === 1 ? 'طي ثنائي' : f === 2 ? 'طي ثلاثي' : 'طي ' + f);
+      if (c.lam) parts.push(c.lam);
+      if (c.corners) parts.push('قص زوايا');
+    } else if (kind === 'book') {
+      parts.push('كتاب/كتيب ' + fmt(c.W, 1) + '×' + fmt(c.L, 1) + ' سم · ' + fmt(c.pages, 0) + ' صفحة');
+      parts.push('داخلي ' + paper + ' ' + (c.color === 'bw' ? 'أبيض وأسود' : 'ملون'));
+      parts.push('غلاف ' + (c.coverPaper || '') + ' ' + (num(c.coverSides) === 2 ? 'وجهين' : 'وجه'));
+      if (c.lam) parts.push(c.lam + ' للغلاف');
+      if (c.bind) parts.push(c.bind);
+    } else if (kind === 'bag') {
+      parts.push('كيس ورقي ' + fmt(c.W, 0) + '×' + fmt(c.H, 0) + '×' + fmt(c.G, 0) + ' سم');
+      parts.push(paper);
+      parts.push('طباعة ' + (c.color === 'bw' ? 'أبيض وأسود' : 'ملونة') + ' ' + (num(c.sides) === 2 ? 'وجهين' : 'وجه'));
+      if (c.handle && !/بدون/.test(c.handle)) parts.push(c.handle);
+      if (c.reinforce) parts.push('قاعدة مقوّاة');
+      if (c.lam) parts.push(c.lam);
+    } else if (kind === 'box') {
+      var T = { tuck: 'كيس بطية', lidbase: 'قفل وقاعدة', drawer: 'درج وكم', magnet: 'مغناطيس' }[c.boxType] || 'بوكس';
+      parts.push('بوكس ' + T + ' ' + fmt(c.L, 0) + '×' + fmt(c.W, 0) + '×' + fmt(c.H, 0) + ' سم');
+      parts.push(paper);
+      parts.push('طباعة ' + (c.color === 'bw' ? 'أبيض وأسود' : 'ملونة') + ' ' + (num(c.sides) === 2 ? 'وجهين' : 'وجه'));
+      if (c.lam) parts.push(c.lam);
+      if (c.glue) parts.push('مُجمّع ولاصق');
+    } else if (kind === 'folder') {
+      parts.push('فولدر ' + (c.foldType === 'tri' ? 'ثلاثي الطي' : 'ثنائي الطي') + ' ' + fmt(c.W, 0) + '×' + fmt(c.H, 0) + ' سم');
+      parts.push(paper);
+      parts.push('طباعة ' + (c.color === 'bw' ? 'أبيض وأسود' : 'ملونة') + ' ' + (num(c.sides) === 2 ? 'وجهين' : 'وجه'));
+      var np = Math.round(num(c.pockets));
+      if (np) parts.push('جيب داخلي' + (np > 1 ? ' ×' + np : ''));
+      if (c.holder) parts.push('جيب كارت');
+      if (c.lam) parts.push(c.lam);
+    } else if (kind === 'hard') {
+      if (c.desc) parts.push(c.desc);
+      parts.push('علبة هارد كفر ' + (c.boxType === 'tray' ? 'قاعدة بدون غطاء' : 'قفل وقاعدة') + ' ' + fmt(c.L, 0) + '×' + fmt(c.W, 0) + '×' + fmt(c.H, 0) + ' سم');
+      var ft = [];
+      if (num(c.outerPrint)) ft.push('طباعة خارجية');
+      if (num(c.innerPrint)) ft.push('طباعة داخلية');
+      if (num(c.lam)) ft.push('لامينيشن خارجي');
+      if (num(c.foilHits)) ft.push('فويل ' + fmt(c.foilHits, 0) + ' موضع');
+      if (num(c.embossHits)) ft.push('بروز/حفر ' + fmt(c.embossHits, 0) + ' موضع');
+      if (num(c.uvHits)) ft.push('UV موضعي ' + fmt(c.uvHits, 0) + ' موضع');
+      if (num(c.magnets)) ft.push('مغناطيس ' + fmt(c.magnets, 0));
+      if (num(c.eva)) ft.push('حشوة فوم ' + fmt(c.eva, 0));
+      if (num(c.dividers)) ft.push('فواصل ' + fmt(c.dividers, 0));
+      if (num(c.ribbonM)) ft.push('شريط ' + fmt(c.ribbonM, 1) + ' م');
+      if (num(c.liningPaper)) ft.push('بطانة ورقية');
+      if (num(c.fabricLining)) ft.push('بطانة قماشية');
+      if (ft.length) parts.push(ft.join(' · '));
+    }
+    return parts.filter(Boolean).join(' · ');
+  }
+
+  return {
+    num: num, r2: r2, fmt: fmt, DEF: DEF, TIERQ: TIERQ,
+    settings: settings, compute: compute, tierTable: tierTable, describe: describe,
+    marginOf: marginOf, blankInfo: blankInfo, piecesFor: piecesFor, sheetsFor: sheetsFor,
+    sheetOf: sheetOf, sheetNames: sheetNames, priceScale: priceScale,
+    boxParts: boxParts, folderParts: folderParts, bagBlank: bagBlank,
+    hardAreas: hardAreas, hardVariable: hardVariable, hardFixed: hardFixed, hardPrice: hardPrice, boxCosts: boxCosts
+  };
+})();
+if (typeof window !== 'undefined') window.PPC = PPC;
+</script>
+
+<script>
+/* =========================================================================
+   الواجهة — تبويبات · نماذج · نتائج · أسعار · عرض سعر
+   ========================================================================= */
+(function () {
+  var PPC = window.PPC, fmt = PPC.fmt, num = PPC.num, r2 = PPC.r2;
+  var LSKEY = 'basma_paper_calc_v1';
+
+  var SECTIONS = [
+    { id: 'sheet', t: 'مطبوعات ورقية', sub: 'فلايرات · بروشورات · منشورات · كروت' },
+    { id: 'book', t: 'كتب وكتيبات', sub: 'داخلي · غلاف · تجليد' },
+    { id: 'bag', t: 'أكياس ورقية', sub: 'مقاسات حرة · يد · تشطيب' },
+    { id: 'box', t: 'بوكسات كرتون', sub: 'كيس بطية · قفل وقاعدة · درج · مغناطيس' },
+    { id: 'folder', t: 'فولدرات', sub: 'ثنائي وثلاثي الطي · جيوب · زاوية كارت' },
+    { id: 'hard', t: 'علب هاردكفر', sub: 'كرتون مقوّى · تغليف · تبطين' }
+  ];
+
+  var SIZES = {
+    'A3': [29.7, 42], 'A4': [21, 29.7], 'A4L': [29.7, 21], 'A5': [14.8, 21],
+    'A5L': [21, 14.8], 'A6': [10.5, 14.8], 'DL': [10, 21], 'BC': [5.5, 9], 'custom': [0, 0]
+  };
+  var SIZE_LBL = { 'A3': 'A3 · 29.7×42', 'A4': 'A4 · 21×29.7', 'A4L': 'A4 عرضي · 29.7×21', 'A5': 'A5 · 14.8×21', 'A5L': 'A5 عرضي · 21×14.8', 'A6': 'A6 · 10.5×14.8', 'DL': 'DL · 10×21', 'BC': 'كرت شخصي · 5.5×9', 'custom': 'مقاس خاص' };
+
+  var DEFITEM = {
+    sheet: { client: '', sheet: 'ديجيتال 45×32', size: 'A4', L: 29.7, W: 21, qty: 1000, paper: 'كوشيه 150 جرام', color: 'color', sides: 1, lam: '', lamSides: 1, folds: 0, corners: false, marginMode: 'auto', margin: '', costMode: 'make', supplierUnit: '', vatShow: true, extras: [] },
+    book: { client: '', sheet: 'ديجيتال 45×32', size: 'A5', L: 21, W: 14.8, qty: 100, pages: 40, paper: 'ورق 80 جرام', color: 'bw', coverPaper: 'كوشيه 250 جرام', coverColor: 'color', coverSides: 1, lam: 'سلوفان مطفي', bind: 'دبوس (تدبيس)', corners: false, marginMode: 'auto', margin: '', costMode: 'make', supplierUnit: '', vatShow: true, extras: [] },
+    bag: { client: '', sheet: 'أوفست 70×100', W: 25, H: 32, G: 10, qty: 500, paper: 'ورق كرافت 120 جرام', color: 'color', sides: 1, topFold: 3, bottom: 3, handle: 'يد حبل ورقي', lam: '', lamSides: 1, reinforce: true, glueBag: true, marginMode: 'auto', margin: '', costMode: 'make', supplierUnit: '', vatShow: true, extras: [] },
+    box: { client: '', sheet: 'أوفست 70×100', boxType: 'tuck', L: 10, W: 6, H: 15, wallH: '', lidH: '', sleeveH: '', manualBlank: false, blankW: '', blankH: '', qty: 500, paper: 'دوبلكس 350 جرام', color: 'color', sides: 1, lam: 'سلوفان مطفي', lamSides: 1, creases: 0, dieMold: true, glue: true, marginMode: 'auto', margin: '', costMode: 'make', supplierUnit: '', vatShow: true, extras: [] },
+    folder: { client: '', sheet: 'أوفست 70×100', foldType: 'tri', W: 22, H: 31, pockets: 1, pocketH: 17, holder: false, holders: 1, gluePockets: true, qty: 250, paper: 'كرتون 350 جرام', color: 'color', sides: 2, lam: 'سلوفان مطفي', lamSides: 1, corners: false, dieMold: true, marginMode: 'auto', margin: '', costMode: 'make', supplierUnit: '', vatShow: true, extras: [] },
+    hard: { client: '', desc: 'علبة صلبة بغطاء منفصل', boxType: 'lid', qty: 1000, L: 30, W: 20, H: 4, lidDepth: 2, turnIn: 2.5, boardWaste: 0.10, wrapWaste: 0.12, extraBoard: 0, extraPaper: 0, liningPaper: 0, fabricLining: 0, innerPrint: 0, outerPrint: 1, lam: 0, magnets: 0, ribbonM: 0, eva: 0, dividers: 0, packUnits: 1, foilHits: 0, embossHits: 0, uvHits: 0, extraConv: 0, manualPrice: '', marketRef: '', vatShow: true }
+  };
+
+  /* ---------- أدوات ---------- */
+  var $ = function (s) { return document.querySelector(s); };
+  var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+  var esc = function (s) {
+    return String(s == null ? '' : s).replace(/[&<>"'\/`]/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;', '/': '&#x2F;', '`': '&#96;' })[c];
+    });
+  };
+  var setPath = function (o, p, v) { var a = p.split('.'), x = o; for (var i = 0; i < a.length - 1; i++) { x = x[a[i]]; if (!x) return; } x[a[a.length - 1]] = v; };
+  var getPath = function (o, p) { return p.split('.').reduce(function (x, k) { return (x == null ? undefined : x[k]); }, o); };
+  var today = function () { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  var toastT = null;
+  function toast(m) { var t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('on'); }, 2200); }
+
+  /* ---------- الحالة ---------- */
+  function loadState() {
+    try { var d = JSON.parse(localStorage.getItem(LSKEY) || 'null'); if (d && d.items) return d; } catch (e) { }
+    return null;
+  }
+  var saved = loadState();
+  var ST = saved
+    ? { sec: saved.sec || 'sheet', settings: PPC.settings(saved.settings), items: Object.assign(JSON.parse(JSON.stringify(DEFITEM)), saved.items || {}), quoteSeq: saved.quoteSeq || 1 }
+    : { sec: 'sheet', settings: PPC.settings(null), items: JSON.parse(JSON.stringify(DEFITEM)), quoteSeq: 1 };
+  var lastRes = null;
+
+  function save() {
+    try { localStorage.setItem(LSKEY, JSON.stringify({ sec: ST.sec, settings: ST.settings, items: ST.items, quoteSeq: ST.quoteSeq })); } catch (e) { }
+  }
+
+  /* ---------- بُناة الحقول ---------- */
+  function fNum(k, label, val, suf, hint) {
+    return '<div class="field"><label>' + label + '</label><div class="suffix"><input type="number" inputmode="decimal" step="any" min="0" data-f="' + k + '" value="' + esc(val) + '"><span>' + (suf || '') + '</span></div>' + (hint ? '<span class="hint">' + hint + '</span>' : '') + '</div>';
+  }
+  function fText(k, label, val, ph) {
+    return '<div class="field"><label>' + label + '</label><input data-f="' + k + '" value="' + esc(val) + '" placeholder="' + esc(ph || '') + '"></div>';
+  }
+  function fSel(k, label, val, list, none, hint) {
+    var norm = function (x) {
+      if (Array.isArray(x)) return { v: x[0], t: x[1] };
+      if (typeof x === 'string') return { v: x, t: x };
+      return { v: x.v, t: x.t };
+    };
+    var opts = (list || []).map(norm);
+    var o = (none ? '<option value="">' + esc(none) + '</option>' : '') + opts.map(function (x) {
+      return '<option value="' + esc(x.v) + '"' + (String(val) === String(x.v) ? ' selected' : '') + '>' + esc(x.t) + '</option>';
+    }).join('');
+    if (val && !opts.some(function (x) { return String(x.v) === String(val); })) o += '<option value="' + esc(val) + '" selected>' + esc(val) + '</option>';
+    return '<div class="field"><label>' + label + '</label><select data-f="' + k + '">' + o + '</select>' + (hint ? '<span class="hint">' + hint + '</span>' : '') + '</div>';
+  }
+  function fSeg(k, label, pairs, val) {
+    return '<div class="field"><label>' + label + '</label><div class="seg" data-seg="' + k + '">' + pairs.map(function (p) {
+      return '<button type="button" data-v="' + esc(p[0]) + '" aria-pressed="' + (String(val) === String(p[0])) + '">' + esc(p[1]) + '</button>';
+    }).join('') + '</div></div>';
+  }
+  function fChk(k, label, val) {
+    return '<label class="check"><input type="checkbox" data-f="' + k + '"' + (val ? ' checked' : '') + '> ' + label + '</label>';
+  }
+  function paperOpts(S) { return (S.papers || []).map(function (p) { return { v: p.name, t: p.name + (p.price ? ' (' + fmt(p.price) + ' ر.س/فرخ مرجعي)' : '') }; }); }
+  function sheetSel(S, val) { return fSel('sheet', 'فرخ الطباعة', val || PPC.sheetNames(S)[0], PPC.sheetNames(S), null, 'السعر يتحجّم تلقائياً مع مقاس الفرخ'); }
+
+  /* ---------- نماذج الأقسام ---------- */
+  function formSheet(it, S) {
+    var h = '<h3 class="sec">الفرخ والمقاس والكمية</h3><div class="grid3">';
+    h += sheetSel(S, it.sheet);
+    h += fSel('size', 'مقاس جاهز', it.size, Object.keys(SIZE_LBL).map(function (k) { return { v: k, t: SIZE_LBL[k] }; }));
+    h += fNum('qty', 'الكمية', it.qty, 'حبة');
+    h += fNum('W', 'العرض', it.W, 'سم');
+    h += fNum('L', 'الطول', it.L, 'سم');
+    h += '</div>';
+    h += '<h3 class="sec">الورق والطباعة</h3><div class="grid3">';
+    h += fSel('paper', 'نوع الورق', it.paper, paperOpts(S));
+    h += fSeg('color', 'الألوان', [['color', 'ملون'], ['bw', 'أبيض وأسود']], it.color);
+    h += fSeg('sides', 'الطباعة', [[1, 'وجه'], [2, 'وجهين']], it.sides);
+    h += '</div>';
+    h += '<h3 class="sec">التشطيب</h3><div class="grid3">';
+    h += fSel('lam', 'السلوفان', it.lam, (S.lams || []).map(function (l) { return { v: l.name, t: l.name }; }), 'بدون سلوفان');
+    h += fSeg('lamSides', 'السلوفان على', [[1, 'وجه'], [2, 'وجهين']], it.lamSides);
+    h += fSeg('folds', 'الطي', [[0, 'بدون'], [1, 'ثنائي'], [2, 'ثلاثي']], it.folds);
+    h += '<div>' + fChk('corners', 'قص زوايا دائري', it.corners) + '</div>';
+    h += '</div>';
+    return h;
+  }
+  function formBook(it, S) {
+    var h = '<h3 class="sec">المقاس والكمية</h3><div class="grid3">';
+    h += sheetSel(S, it.sheet);
+    h += fSel('size', 'مقاس الصفحة', it.size, Object.keys(SIZE_LBL).filter(function (k) { return k !== 'DL' && k !== 'BC'; }).map(function (k) { return { v: k, t: SIZE_LBL[k] }; }));
+    h += fNum('qty', 'عدد النسخ', it.qty, 'نسخة');
+    h += fNum('W', 'عرض الصفحة', it.W, 'سم');
+    h += fNum('L', 'طول الصفحة', it.L, 'سم');
+    h += fNum('pages', 'الصفحات الداخلية', it.pages, 'صفحة', 'بدون الغلاف');
+    h += '</div>';
+    h += '<h3 class="sec">الصفحات الداخلية</h3><div class="grid3">';
+    h += fSel('paper', 'ورق الداخلي', it.paper, paperOpts(S));
+    h += fSeg('color', 'ألوان الداخلي', [['color', 'ملون'], ['bw', 'أبيض وأسود']], it.color);
+    h += '</div>';
+    h += '<h3 class="sec">الغلاف والتجليد</h3><div class="grid3">';
+    h += fSel('coverPaper', 'ورق الغلاف', it.coverPaper, paperOpts(S));
+    h += fSeg('coverColor', 'ألوان الغلاف', [['color', 'ملون'], ['bw', 'أبيض وأسود']], it.coverColor);
+    h += fSeg('coverSides', 'طباعة الغلاف', [[1, 'وجه'], [2, 'وجهين']], it.coverSides);
+    h += fSel('lam', 'سلوفان الغلاف', it.lam, (S.lams || []).map(function (l) { return { v: l.name, t: l.name }; }), 'بدون سلوفان');
+    h += fSel('bind', 'التجليد', it.bind, (S.binds || []).map(function (b) { return { v: b.name, t: b.name + ' (' + fmt(b.price) + ')' }; }), 'بدون تجليد');
+    h += '<div>' + fChk('corners', 'قص زوايا دائري', it.corners) + '</div>';
+    h += '</div>';
+    return h;
+  }
+  function formBag(it, S) {
+    var h = '<h3 class="sec">مقاس الكيس والكمية</h3><div class="grid3">';
+    h += sheetSel(S, it.sheet);
+    h += fNum('qty', 'الكمية', it.qty, 'كيس');
+    h += fNum('W', 'العرض', it.W, 'سم');
+    h += fNum('H', 'الطول', it.H, 'سم');
+    h += fNum('G', 'البطن (العمق)', it.G, 'سم');
+    h += fNum('topFold', 'الطية العلوية', it.topFold, 'سم');
+    h += fNum('bottom', 'القاعدة السفلية', it.bottom, 'سم');
+    h += '</div>';
+    h += '<h3 class="sec">الورق والطباعة</h3><div class="grid3">';
+    h += fSel('paper', 'نوع الورق', it.paper, paperOpts(S), null, 'الكرافت أو الأرت كارد هي المعتاد');
+    h += fSeg('color', 'الألوان', [['color', 'ملون'], ['bw', 'أبيض وأسود']], it.color);
+    h += fSeg('sides', 'الطباعة', [[1, 'وجه'], [2, 'وجهين']], it.sides);
+    h += '</div>';
+    h += '<h3 class="sec">اليد والتشطيب</h3><div class="grid3">';
+    h += fSel('handle', 'اليد', it.handle, (S.handles || []).map(function (x) { return { v: x.name, t: x.name + (x.price ? ' (' + fmt(x.price) + ')' : '') }; }));
+    h += fSel('lam', 'السلوفان', it.lam, (S.lams || []).map(function (l) { return { v: l.name, t: l.name }; }), 'بدون سلوفان');
+    h += fSeg('lamSides', 'السلوفان على', [[1, 'وجه'], [2, 'وجهين']], it.lamSides);
+    h += '<div>' + fChk('reinforce', 'تقوية القاعدة (كرتون)', it.reinforce) + '</div>';
+    h += '<div>' + fChk('glueBag', 'لزق وتجميع الكيس', it.glueBag) + '</div>';
+    h += '</div>';
+    return h;
+  }
+  function formBox(it, S) {
+    var T = [['tuck', 'كيس بطية'], ['lidbase', 'قفل وقاعدة'], ['drawer', 'درج وكم'], ['magnet', 'مغناطيس']];
+    var h = '<h3 class="sec">نوع البوكس والفرخ</h3><div class="grid3">';
+    h += sheetSel(S, it.sheet);
+    h += fSel('boxType', 'نوع البوكس', it.boxType, T);
+    h += fNum('qty', 'الكمية', it.qty, 'بوكس');
+    h += '</div>';
+    h += '<h3 class="sec">المقاسات</h3><div class="grid3">';
+    h += fNum('L', 'الطول', it.L, 'سم');
+    h += fNum('W', 'العرض', it.W, 'سم');
+    h += fNum('H', 'الارتفاع', it.H, 'سم');
+    if (it.boxType === 'lidbase') { h += fNum('wallH', 'ارتفاع القاعدة (فراغ = الارتفاع)', it.wallH, 'سم'); h += fNum('lidH', 'ارتفاع الغطاء (فراغ = 35%)', it.lidH, 'سم'); }
+    if (it.boxType === 'drawer') { h += fNum('wallH', 'ارتفاع حواف الدرج', it.wallH, 'سم'); h += fNum('sleeveH', 'ارتفاع الكم', it.sleeveH, 'سم'); }
+    h += '<div>' + fChk('manualBlank', 'تحديد مقاس الفرخ المفرود يدوياً', it.manualBlank) + '</div>';
+    if (it.manualBlank) { h += fNum('blankW', 'عرض المفرود', it.blankW, 'سم'); h += fNum('blankH', 'طول المفرود', it.blankH, 'سم'); }
+    h += '</div>';
+    h += '<h3 class="sec">الخامة والطباعة</h3><div class="grid3">';
+    h += fSel('paper', 'الكرتون', it.paper, paperOpts(S), null, 'للعلب المقوّاة (الهاردكفر) استخدم تبويب «علب هاردكفر»');
+    h += fSeg('color', 'الألوان', [['color', 'ملون'], ['bw', 'أبيض وأسود']], it.color);
+    h += fSeg('sides', 'الطباعة', [[1, 'وجه'], [2, 'وجهين']], it.sides);
+    h += fSel('lam', 'السلوفان', it.lam, (S.lams || []).map(function (l) { return { v: l.name, t: l.name }; }), 'بدون سلوفان');
+    h += fSeg('lamSides', 'السلوفان على', [[1, 'وجه'], [2, 'وجهين']], it.lamSides);
+    h += fNum('creases', 'عدد خطوط التكسير (0 = تلقائي)', it.creases, 'خط');
+    h += '</div>';
+    h += '<h3 class="sec">القص والتجميع</h3><div class="grid3">';
+    h += '<div>' + fChk('dieMold', 'قالب / كليشة جديدة (مرة واحدة)', it.dieMold) + '</div>';
+    h += '<div>' + fChk('glue', 'لزق وتجميع', it.glue) + '</div>';
+    h += '</div>';
+    return h;
+  }
+  function formFolder(it, S) {
+    var h = '<h3 class="sec">نوع الطي والفرخ</h3><div class="grid3">';
+    h += sheetSel(S, it.sheet);
+    h += fSeg('foldType', 'نوع الطي', [['bi', 'ثنائي الطي'], ['tri', 'ثلاثي الطي']], it.foldType);
+    h += fNum('qty', 'الكمية', it.qty, 'فولدر');
+    h += '</div>';
+    h += '<h3 class="sec">المقاس (مقفول)</h3><div class="grid3">';
+    h += fNum('W', 'العرض', it.W, 'سم');
+    h += fNum('H', 'الارتفاع', it.H, 'سم');
+    h += fSeg('pockets', 'الجيوب الداخلية', [[0, 'بدون'], [1, 'جيب'], [2, 'جيبان']], it.pockets);
+    h += fNum('pocketH', 'ارتفاع الجيب (فراغ = 55%)', it.pocketH, 'سم');
+    h += '<div>' + fChk('holder', 'جيب / زاوية كارت', it.holder) + '</div>';
+    if (it.holder) h += fNum('holders', 'عدد جيوب الكارت', it.holders, 'جيب');
+    h += '<div>' + fChk('corners', 'قص زوايا دائري', it.corners) + '</div>';
+    h += '</div>';
+    h += '<h3 class="sec">الخامة والطباعة</h3><div class="grid3">';
+    h += fSel('paper', 'الكرتون', it.paper, paperOpts(S), null, 'المعتاد: كرتون 300-400 جرام');
+    h += fSeg('color', 'الألوان', [['color', 'ملون'], ['bw', 'أبيض وأسود']], it.color);
+    h += fSeg('sides', 'الطباعة', [[1, 'وجه'], [2, 'وجهين']], it.sides);
+    h += fSel('lam', 'السلوفان', it.lam, (S.lams || []).map(function (l) { return { v: l.name, t: l.name }; }), 'بدون سلوفان');
+    h += fSeg('lamSides', 'السلوفان على', [[1, 'وجه'], [2, 'وجهين']], it.lamSides);
+    h += '</div>';
+    h += '<h3 class="sec">التشطيب</h3><div class="grid3">';
+    h += '<div>' + fChk('dieMold', 'قالب / كليشة جديدة (مرة واحدة)', it.dieMold) + '</div>';
+    h += '<div>' + fChk('gluePockets', 'لزق الجيوب', it.gluePockets) + '</div>';
+    h += '</div>';
+    return h;
+  }
+
+  function formHard(it, S) {
+    /* اقتراحات مساحات الهياكل الخاصة (تقديرية — تُكتب يدوياً في الحقول) */
+    var g = 0.3, flap = 5, a = num(it.turnIn);
+    var Lc = num(it.L) + 2 * g, len = (num(it.W) + 2 * g) + (num(it.H) + g) + (num(it.W) + 2 * g) + flap;
+    var magB = (Lc * len) / 1e4, magW = ((Lc + 2 * a) * (len + 2 * a)) / 1e4;
+    var L3 = num(it.L) + g, W3 = num(it.W) + 2 * g, H3 = num(it.H) + 2 * g;
+    var drB = (2 * L3 * W3 + 2 * L3 * H3) / 1e4;
+    var drW = ((L3 + 2 * a) * (2 * W3 + 2 * H3 + 2 + 2 * a)) / 1e4;
+
+    var h = '<h3 class="sec">مواصفات الطلب</h3><div class="grid3">';
+    h += '<div class="field full"><label>وصف الطلب</label><input data-f="desc" value="' + esc(it.desc || '') + '" placeholder="مثال: علبة صلبة بغطاء منفصل"></div>';
+    h += fSel('boxType', 'نوع الهيكل', it.boxType, [['lid', 'قفل وقاعدة (غطاء منفصل)'], ['tray', 'قاعدة بدون غطاء']]);
+    h += fNum('qty', 'كمية الطلب', it.qty, 'علبة');
+    h += fNum('L', 'الطول الداخلي', it.L, 'سم');
+    h += fNum('W', 'العرض الداخلي', it.W, 'سم');
+    h += fNum('H', 'الارتفاع الداخلي', it.H, 'سم');
+    if (it.boxType !== 'tray') h += fNum('lidDepth', 'عمق الغطاء', it.lidDepth, 'سم');
+    h += fNum('turnIn', 'سماحية لف الورق حول اللوح', it.turnIn, 'سم/جهة', 'المعتاد 2–2.5 سم');
+    h += fNum('boardWaste', 'هدر اللوح الرمادي', it.boardWaste, '×', '0.10 = 10%');
+    h += fNum('wrapWaste', 'هدر ورق التغليف', it.wrapWaste, '×', '0.12 = 12%');
+    h += '</div>';
+
+    h += '<h3 class="sec">مساحات إضافية (للمغناطيس أو الكتابي أو الدرج)</h3><div class="grid3">';
+    h += fNum('extraBoard', 'مساحة ألواح إضافية', it.extraBoard, 'م²/علبة', 'مغناطيس ≈ ' + fmt(magB, 3) + ' · درج ≈ ' + fmt(drB, 3));
+    h += fNum('extraPaper', 'مساحة ورق إضافية', it.extraPaper, 'م²/علبة', 'مغناطيس ≈ ' + fmt(magW, 3) + ' · درج ≈ ' + fmt(drW, 3));
+    h += fNum('liningPaper', 'بطانة ورقية داخلية', it.liningPaper, 'م²/علبة');
+    h += fNum('fabricLining', 'بطانة قماشية', it.fabricLining, 'م²/علبة');
+    h += '</div>';
+
+    h += '<h3 class="sec">الطباعة والتشطيب</h3><div class="grid3">';
+    h += fSeg('outerPrint', 'طباعة خارجية', [[0, 'بدون'], [1, 'نعم']], it.outerPrint);
+    h += fSeg('innerPrint', 'طباعة داخلية', [[0, 'بدون'], [1, 'نعم']], it.innerPrint);
+    h += fSeg('lam', 'لامينيشن خارجي', [[0, 'بدون'], [1, 'نعم']], it.lam);
+    h += fNum('foilHits', 'ضربات الفويل الساخن', it.foilHits, 'موضع/علبة');
+    h += fNum('embossHits', 'مواضع البروز أو الحفر', it.embossHits, 'موضع/علبة');
+    h += fNum('uvHits', 'مواضع UV الموضعي', it.uvHits, 'موضع/علبة');
+    h += '</div>';
+
+    h += '<h3 class="sec">الحشوات والإغلاقات والتغليف</h3><div class="grid3">';
+    h += fNum('magnets', 'عدد قطع المغناطيس', it.magnets, 'قطعة/علبة', 'المعتاد 2 للغطاء المغناطيسي');
+    h += fNum('eva', 'حشوات EVA أو فوم', it.eva, 'قطعة/علبة');
+    h += fNum('dividers', 'فواصل أو حوامل كرتونية', it.dividers, 'قطعة/علبة');
+    h += fNum('ribbonM', 'طول الشريط', it.ribbonM, 'م/علبة');
+    h += fNum('packUnits', 'وحدات التغليف الفردي', it.packUnits, 'وحدة/علبة');
+    h += fNum('extraConv', 'تحويل أو معالجة خاصة', it.extraConv, 'ر.س/علبة');
+    h += '</div>';
+
+    h += '<h3 class="sec">السعر</h3><div class="grid3">';
+    h += fNum('manualPrice', 'سعر بيع يدوي للوحدة', it.manualPrice, 'ر.س', 'اتركه فارغاً ليُحسب من الهامش المستهدف');
+    h += fNum('marketRef', 'سعر السوق المرجعي للقطعة', it.marketRef, 'ر.س', 'للمقارنة فقط — قبل الضريبة');
+    h += '</div>';
+    return h;
+  }
+
+  function extrasEditor(it) {
+    var h = '<h3 class="sec">إضافات بسعر للحبة (ترقيم · تغليف · فويل · إمبوس…)</h3><div id="extras">';
+    (it.extras || []).forEach(function (x, i) {
+      h += '<div class="extra"><input data-x="name" data-i="' + i + '" value="' + esc(x.name || '') + '" placeholder="البند"><div class="suffix"><input type="number" step="any" min="0" data-x="price" data-i="' + i + '" value="' + esc(x.price || '') + '" placeholder="0"><span>ر.س</span></div><button class="xbtn" type="button" data-act="delExtra" data-i="' + i + '">✕</button></div>';
+    });
+    h += '</div><div class="actionsbar"><button class="btn" type="button" data-act="addExtra">+ إضافة بند</button></div>';
+    return h;
+  }
+
+  function tail(it, S) {
+    var m = PPC.marginOf(it, S);
+    var h = '<div class="sep"></div><h3 class="sec">الهامش ومصدر التكلفة</h3><div class="grid3">';
+    h += fSeg('marginMode', 'طريقة الهامش', [['auto', 'تلقائي حسب الكمية'], ['manual', 'يدوي']], it.marginMode);
+    if (it.marginMode === 'manual') h += fNum('margin', 'نسبة الهامش', it.margin, '×', '0.5 = 50% · 1.5 = 150%');
+    else h += '<div class="field"><label>الهامش المطبّق تلقائياً</label><input value="' + fmt(m * 100, 0) + '%" disabled></div>';
+    h += '</div><div class="grid2" style="margin-top:12px">';
+    h += fSeg('costMode', 'مصدر التكلفة', [['make', 'تصنيع داخلي'], ['buy', 'شراء جاهز من المورد']], it.costMode);
+    h += fNum('supplierUnit', 'سعر المورد للقطعة', it.supplierUnit, 'ر.س', it.costMode === 'buy' ? 'هو التكلفة المعتمدة' : 'للمقارنة فقط');
+    h += '</div>';
+    h += extrasEditor(it);
+    return h;
+  }
+
+  /* تطبيق المقاس الجاهز — بعد قراءة النموذج حتى لا تُدهس القيم */
+  function applySize() {
+    var it = ST.items[ST.sec];
+    readForm();
+    var sz = SIZES[it.size];
+    if (sz && sz[0]) { it.W = sz[0]; it.L = sz[1]; }
+    save(); renderForm(); renderResult();
+  }
+
+  function renderForm() {
+    var sec = SECTIONS.filter(function (s) { return s.id === ST.sec; })[0];
+    var it = ST.items[ST.sec], S = ST.settings;
+    $('#fTitle').textContent = sec.t;
+    $('#fSub').textContent = sec.sub;
+    var h = '<div class="field full"><label>العميل (يظهر في عرض السعر)</label><input data-f="client" value="' + esc(it.client || '') + '" placeholder="اسم العميل"></div>';
+    h += '<div class="sep"></div>';
+    if (ST.sec === 'sheet') h += formSheet(it, S);
+    if (ST.sec === 'book') h += formBook(it, S);
+    if (ST.sec === 'bag') h += formBag(it, S);
+    if (ST.sec === 'box') h += formBox(it, S);
+    if (ST.sec === 'folder') h += formFolder(it, S);
+    if (ST.sec === 'hard') h += formHard(it, S);
+    h += tail(it, S);
+    $('#formBody').innerHTML = h;
+  }
+
+  function renderTabs() {
+    $('#tabs').innerHTML = SECTIONS.map(function (s) {
+      return '<button role="tab" type="button" data-tab="' + s.id + '" aria-selected="' + (ST.sec === s.id) + '">' + esc(s.t) + '<small>' + esc(s.sub) + '</small></button>';
+    }).join('');
+  }
+
+  /* ---------- النتيجة ---------- */
+  /* ---------- نتيجة تبويب علب الهارد كفر (نموذج حاسبة الإكسل) ---------- */
+  function renderHard(it, S, r) {
+    if (!r) { $('#resBody').innerHTML = '<p class="note">أكمل البيانات.</p>'; return; }
+    var B = r.B, A = r.areas;
+    var row = function (t, v, cls) { return '<tr' + (cls ? ' class="' + cls + '"' : '') + '><td>' + t + '</td><td class="n">' + v + '</td></tr>'; };
+    var h = '<div class="desc">' + esc(PPC.describe('hard', it, S)) + '</div>';
+    h += '<div class="kpis">';
+    h += '<div class="kpi hl"><div class="l">سعر الوحدة قبل الضريبة</div><div class="v">' + fmt(r.unit) + '</div><div class="s">' + (r.manual ? 'سعر يدوي مُدخل' : 'هامش ' + fmt(num(B.marginPct) * 100, 0) + '% من صافي البيع') + '</div></div>';
+    h += '<div class="kpi"><div class="l">تكلفة العلبة</div><div class="v">' + fmt(r.costBox) + '</div><div class="s">بعد توزيع رسوم الطلب</div></div>';
+    h += '<div class="kpi"><div class="l">المكسب بعد العمولة</div><div class="v">' + fmt(r.profit) + '</div><div class="s">هامش فعلي ' + fmt(r.marginActual * 100, 0) + '%</div></div>';
+    h += '<div class="kpi"><div class="l">قيمة العرض شامل الضريبة</div><div class="v">' + fmt(r.orderGross) + '</div><div class="s">قبل الضريبة ' + fmt(r.orderNet) + '</div></div>';
+    h += '</div>';
+    h += '<div class="note">استهلاك العلبة: لوح <b>' + fmt(A.board, 4) + ' م²</b> · ورق تغليف <b>' + fmt(A.wrap, 4) + ' م²</b>' +
+      (A.lining ? ' · بطانة ' + fmt(A.lining, 4) + ' م²' : '') + (A.fabric ? ' · قماش ' + fmt(A.fabric, 4) + ' م²' : '') + '</div>';
+
+    h += '<table class="lines"><tbody>';
+    r.lines.forEach(function (l) { h += '<tr><td>' + esc(l.t) + (l.f ? '<br><span class="hint">' + esc(l.f) + '</span>' : '') + '</td><td class="n">' + fmt(l.v) + '</td></tr>'; });
+    h += '<tr class="tot"><td>إجمالي التكلفة المتغيرة للعلبة</td><td class="n">' + fmt(r.variable) + '</td></tr>';
+    h += '</tbody></table>';
+
+    h += '<h3 class="sec">رسوم ثابتة للطلب</h3><table class="lines"><tbody>';
+    if (r.fixed.length) r.fixed.forEach(function (l) { h += row(esc(l.t), fmt(l.v)); });
+    else h += row('لا توجد رسوم ثابتة', '0');
+    h += '<tr class="tot"><td>إجمالي الرسوم الثابتة للطلب</td><td class="n">' + fmt(r.fixedTotal) + '</td></tr>';
+    h += '</tbody></table>';
+
+    h += '<h3 class="sec">حساب الطلب والسعر</h3><table class="lines"><tbody>';
+    h += row('التكلفة المتغيرة للطلب (' + fmt(r.qty, 0) + ' × ' + fmt(r.variable) + ')', fmt(r.varOrder));
+    h += row('الرسوم الثابتة', fmt(r.fixedTotal));
+    h += row('تحميل المصاريف غير المباشرة (' + fmt(num(B.overheadPct) * 100, 0) + '%)', fmt(r.overhead));
+    h += row('<b>إجمالي تكلفة تنفيذ الطلب</b>', '<b>' + fmt(r.totalCost) + '</b>', 'tot');
+    h += row('قيمة البيع قبل الضريبة', fmt(r.orderNet));
+    if (num(B.commissionPct)) h += row('عمولة البيع (' + fmt(num(B.commissionPct) * 100, 0) + '%)', fmt(r.commission));
+    h += row('المكسب بعد العمولة', fmt(r.profit));
+    h += row('ضريبة القيمة المضافة (' + fmt(num(B.vat) * 100, 0) + '%)', fmt(r.vatAmt));
+    h += row('<b>قيمة العرض شامل الضريبة</b>', '<b>' + fmt(r.orderGross) + '</b>', 'tot');
+    h += '</tbody></table>';
+
+    h += '<h3 class="sec">تأثير الكمية على التكلفة والسعر</h3><table class="tiers"><thead><tr><th>الكمية</th><th>تكلفة الوحدة</th><th>سعر البيع</th><th>المكسب المتوقع</th></tr></thead><tbody>';
+    r.tiers.forEach(function (t) { h += '<tr' + (t.qty === r.qty ? ' class="on"' : '') + '><td>' + fmt(t.qty, 0) + '</td><td>' + fmt(t.cost) + '</td><td>' + fmt(t.price) + '</td><td>' + fmt(t.profit) + '</td></tr>'; });
+    h += '</tbody></table>';
+
+    if (r.market > 0) {
+      var diff = r.unit - r.market, pct = r.market ? (diff / r.market) * 100 : 0;
+      h += '<div class="note" style="background:' + (diff > 0 ? '#FDECEA' : '#EAF7EF') + '">مرجع السوق: <b>' + fmt(r.market) + '</b> ر.س للقطعة · سعرك <b>' + fmt(r.unit) + '</b> — ' +
+        (diff > 0 ? 'أنت <b>أعلى</b> بـ ' + fmt(Math.abs(pct), 0) + '%' : 'أنت <b>أقل</b> بـ ' + fmt(Math.abs(pct), 0) + '%') + '</div>';
+    }
+    if (r.warn.length) h += '<div class="warn">⚠ ' + r.warn.map(esc).join('<br>⚠ ') + '</div>';
+    h += '<div class="actionsbar"><button class="btn primary" type="button" data-act="quote">🖨 عرض سعر</button><button class="btn" type="button" data-act="copy">📋 نسخ الملخص</button>';
+    h += '<label class="check" style="padding:0 6px"><input type="checkbox" data-f2="vatShow"' + (it.vatShow !== false ? ' checked' : '') + '> إظهار الضريبة في العرض</label></div>';
+    $('#resBody').innerHTML = h;
+  }
+
+  function renderResult() {
+    var it = ST.items[ST.sec], S = ST.settings;
+    if (ST.sec === 'hard') { var rh = PPC.compute('hard', it, S); lastRes = rh; renderHard(it, S, rh); return; }
+    var r = PPC.compute(ST.sec, it, S);
+    lastRes = r;
+    if (!r) { $('#resBody').innerHTML = '<p class="note">أكمل البيانات.</p>'; return; }
+    var m = r.meta || {};
+    var h = '<div class="desc">' + esc(PPC.describe(ST.sec, it, S)) + '</div>';
+    h += '<div class="kpis">';
+    h += '<div class="kpi"><div class="l">التكلفة الإجمالية</div><div class="v">' + fmt(r.cost) + '</div><div class="s">تكلفة القطعة ' + fmt(r.unitCost) + ' ر.س</div></div>';
+    h += '<div class="kpi hl"><div class="l">سعر البيع</div><div class="v">' + fmt(r.final) + '</div><div class="s">' + fmt(r.unit) + ' ر.س للقطعة</div></div>';
+    h += '<div class="kpi"><div class="l">الربح</div><div class="v">' + fmt(r.profit) + '</div><div class="s">هامش ' + fmt(r.margin * 100, 0) + '% فوق التكلفة</div></div>';
+    if (m.isHard) h += '<div class="kpi"><div class="l">كرتون مقوّى</div><div class="v">' + fmt(m.tot.board, 2) + '</div><div class="s">م² للطلب · تغليف ' + fmt(m.tot.wrap, 2) + ' م²</div></div>';
+    else h += '<div class="kpi"><div class="l">الورق / الفُرَخ</div><div class="v">' + (m.sheets != null ? fmt(m.sheets, 0) : '—') + '</div><div class="s">' + esc(m.sheet || '') + '</div></div>';
+    h += '</div>';
+    if (r.raised) h += '<div class="warn">السعر المحسوب أقل من الحد الأدنى للطلب (' + fmt(S.minOrder) + ' ر.س) — تم رفعه للحد الأدنى.</div>';
+    h += '<table class="lines"><tbody>';
+    r.lines.forEach(function (l) {
+      h += '<tr class="' + (l.info ? 'info' : '') + (l.miss ? ' miss' : '') + '"><td>' + esc(l.t) + (l.f ? '<br><span class="hint">' + esc(l.f) + '</span>' : '') + '</td><td class="n">' + (l.v != null ? fmt(l.v) : '') + '</td></tr>';
+    });
+    h += '<tr class="tot"><td>تكلفة الطلب</td><td class="n">' + fmt(r.cost) + '</td></tr>';
+    h += '<tr class="tot"><td>سعر البيع قبل الضريبة (هامش ' + fmt(r.margin * 100, 0) + '%)</td><td class="n">' + fmt(r.final) + '</td></tr>';
+    h += '</tbody></table>';
+    if (m.isHard && m.mat > 0) {
+      var mult = r.final / m.mat;
+      h += '<div class="note">الخامات (كرتون + تغليف + تبطين) = <b>' + fmt(m.mat) + '</b> ر.س · سعر البيع ÷ الخامات = <b>' + fmt(mult) + '×</b>. ' +
+        (mult < 1.4 ? 'أقل من معتاد الصناعة (١.٤٠–١.٥٠×) — راجع بند العمل اليدوي والمصاريف، أو تحقّق من سعر الكرتون.' : 'داخل نطاق الصناعة (١.٤٠–١.٥٠×).') + '</div>';
+    }
+
+    var tiers = PPC.tierTable(ST.sec, it, S), q = Math.round(num(it.qty));
+    h += '<h3 class="sec">أسعار حسب الكمية</h3><table class="tiers"><thead><tr><th>الكمية</th><th>سعر القطعة</th><th>الإجمالي</th></tr></thead><tbody>';
+    tiers.forEach(function (t) {
+      h += '<tr class="' + (t.qty === q ? 'on' : '') + '"><td>' + fmt(t.qty, 0) + '</td><td>' + fmt(t.unit) + '</td><td>' + fmt(t.final) + '</td></tr>';
+    });
+    h += '</tbody></table>';
+    if (r.warn.length) h += '<div class="warn">⚠ ' + r.warn.map(esc).join('<br>⚠ ') + '</div>';
+    var vatAmt = r2(r.final * num(S.vat));
+    h += '<div class="actionsbar"><button class="btn primary" type="button" data-act="quote">🖨 عرض سعر</button><button class="btn" type="button" data-act="copy">📋 نسخ الملخص</button>';
+    h += '<label class="check" style="padding:0 6px"><input type="checkbox" data-f2="vatShow"' + (it.vatShow !== false ? ' checked' : '') + '> إظهار الضريبة 15% (+' + fmt(vatAmt) + ')</label></div>';
+    $('#resBody').innerHTML = h;
+  }
+
+  function render() { readForm(); save(); renderResult(); }
+
+  /* ---------- قراءة النموذج ---------- */
+  function readForm() {
+    var it = ST.items[ST.sec];
+    $$('#formBody [data-f]').forEach(function (el) {
+      var k = el.getAttribute('data-f');
+      it[k] = (el.type === 'checkbox') ? el.checked : el.value;
+    });
+    var ex = [];
+    $$('#formBody [data-x]').forEach(function (el) {
+      var i = +el.getAttribute('data-i'), f = el.getAttribute('data-x');
+      ex[i] = ex[i] || { name: '', price: '' };
+      ex[i][f] = el.value;
+    });
+    it.extras = ex.filter(function (x) { return x && ((x.name && x.name.trim()) || num(x.price)); });
+    var sv = [];
+    $$('#formBody [data-svc]').forEach(function (el) { if (el.checked) sv.push(el.getAttribute('data-svc')); });
+    it.svcs = sv;
+  }
+
+  /* ---------- لوحة الأسعار ---------- */
+  function listEd(key, fields, unit, addLabel) {
+    var S = ST.settings, list = S[key] || [];
+    var h = '<div>';
+    list.forEach(function (row, i) {
+      h += '<div class="listrow">';
+      fields.forEach(function (f) {
+        if (f.type === 'text') h += '<input data-l="name" data-s="' + key + '.' + i + '.' + f.k + '" value="' + esc(row[f.k]) + '" placeholder="' + esc(f.ph || '') + '">';
+        else h += '<div class="suffix" style="width:' + (f.w || 130) + 'px"><input type="number" step="any" data-s="' + key + '.' + i + '.' + f.k + '" value="' + esc(row[f.k]) + '" aria-label="' + esc(f.ph || f.k) + '"><span>' + esc(f.suf || '') + '</span></div>';
+      });
+      h += '<button class="xbtn" type="button" data-act="delRow" data-key="' + key + '" data-i="' + i + '">✕</button></div>';
+    });
+    h += '<div class="actionsbar"><button class="btn" type="button" data-act="addRow" data-key="' + key + '">+ ' + (addLabel || 'إضافة') + '</button><span class="hint">' + (unit || '') + '</span></div></div>';
+    return h;
+  }
+  function numField(path, label, suf, hint) {
+    return '<div class="field"><label>' + label + '</label><div class="suffix"><input type="number" step="any" min="0" data-s="' + path + '" value="' + esc(getPath(ST.settings, path)) + '"><span>' + suf + '</span></div>' + (hint ? '<span class="hint">' + hint + '</span>' : '') + '</div>';
+  }
+  function renderSettings() {
+    var S = ST.settings;
+    var h = '<h3 class="sec">١ · الفُرَخ (مقاس · سعر الضغطة · الزنكة)</h3>';
+    h += '<div class="listrow" style="font-size:12px;color:var(--muted)"><div style="flex:1">الاسم</div><div class="suffix" style="width:80px"><span>طول</span></div><div class="suffix" style="width:80px"><span>عرض</span></div><div class="suffix" style="width:95px"><span>ملون</span></div><div class="suffix" style="width:95px"><span>أبيض</span></div><div class="suffix" style="width:95px"><span>زنكة</span></div></div>';
+    (S.sheets || []).forEach(function (sh, i) {
+      h += '<div class="listrow"><input data-l="name" data-s="sheets.' + i + '.name" value="' + esc(sh.name) + '">';
+      h += '<div class="suffix" style="width:80px"><input type="number" step="any" data-s="sheets.' + i + '.L" value="' + esc(sh.L) + '"><span>سم</span></div>';
+      h += '<div class="suffix" style="width:80px"><input type="number" step="any" data-s="sheets.' + i + '.W" value="' + esc(sh.W) + '"><span>سم</span></div>';
+      h += '<div class="suffix" style="width:95px"><input type="number" step="any" data-s="sheets.' + i + '.clickColor" value="' + esc(sh.clickColor) + '"><span>ر.س</span></div>';
+      h += '<div class="suffix" style="width:95px"><input type="number" step="any" data-s="sheets.' + i + '.clickBw" value="' + esc(sh.clickBw) + '"><span>ر.س</span></div>';
+      h += '<div class="suffix" style="width:95px"><input type="number" step="any" data-s="sheets.' + i + '.plate" value="' + esc(sh.plate) + '"><span>ر.س</span></div>';
+      h += '<button class="xbtn" type="button" data-act="delRow" data-key="sheets" data-i="' + i + '">✕</button></div>';
+    });
+    h += '<div class="actionsbar"><button class="btn" type="button" data-act="addRow" data-key="sheets">+ إضافة فرخ</button><span class="hint">سعر الضغطة = تكلفة الوجه الواحد · الزنكة = 0 للديجيتال</span></div>';
+    h += '<div class="grid3" style="margin-top:12px">' + numField('refL', 'الفرخ المرجعي — الطول', 'سم') + numField('refW', 'الفرخ المرجعي — العرض', 'سم') + numField('waste', 'نسبة الهالك', '%', 'تُدخل كنسبة: 0.075 = 7.5%') + '</div>';
+
+    h += '<div class="sep"></div><h3 class="sec">٢ · الورق والكرتون (سعر الفرخ المرجعي)</h3>';
+    h += listEd('papers', [{ k: 'name', type: 'text', ph: 'اسم الورق' }, { k: 'price', suf: 'ر.س', w: 150 }], 'السعر لفرخ ' + fmt(S.refL, 0) + '×' + fmt(S.refW, 0) + ' — يتحجّم تلقائياً مع الفرخ المختار', 'إضافة ورق');
+
+    h += '<div class="sep"></div><h3 class="sec">٣ · السلوفان والتجليد واليد</h3><div class="grid3">';
+    h += '<div><b style="font-size:13px">السلوفان (للفرخ المرجعي)</b>' + listEd('lams', [{ k: 'name', type: 'text' }, { k: 'price', suf: 'ر.س', w: 120 }], '', 'إضافة') + '</div>';
+    h += '<div><b style="font-size:13px">التجليد (للنسخة)</b>' + listEd('binds', [{ k: 'name', type: 'text' }, { k: 'price', suf: 'ر.س', w: 120 }], '', 'إضافة') + '</div>';
+    h += '<div><b style="font-size:13px">اليد (للكيس)</b>' + listEd('handles', [{ k: 'name', type: 'text' }, { k: 'price', suf: 'ر.س', w: 120 }], '', 'إضافة') + '</div>';
+    h += '</div>';
+
+    h += '<div class="sep"></div><h3 class="sec">٤ · التشغيل والتشطيب (للطلب / للحبة)</h3><div class="grid3">';
+    h += numField('setup', 'تجهيز الملف والماكينة', 'ر.س', 'للطلب');
+    h += numField('cutJob', 'قص بالمقصلة', 'ر.س', 'للطلب');
+    h += numField('fold', 'طي', 'ر.س', 'للطية للحبة');
+    h += numField('corners', 'قص زوايا', 'ر.س', 'للحبة');
+    h += numField('crease', 'تكسير', 'ر.س', 'للخط للحبة');
+    h += numField('diePerPiece', 'قص بالقالب', 'ر.س', 'للحبة');
+    h += numField('dieMold', 'قالب / كليشة', 'ر.س', 'مرة واحدة للطلب');
+    h += numField('gluePerPiece', 'لزق وتجميع', 'ر.س', 'للحبة أو للجيب');
+    h += numField('magnetPrice', 'المغناطيس', 'ر.س', 'لقطعة المغناطيس');
+    h += numField('baseBoard', 'تقوية قاعدة الكيس', 'ر.س', 'للكيس');
+    h += numField('bagSetup', 'تجهيز طباعة الأكياس', 'ر.س', 'للطلب');
+    h += '</div>';
+
+    h += '<div class="sep"></div><h3 class="sec">٥ · الهامش والحد الأدنى والضريبة</h3><div class="grid3">';
+    h += numField('marginDefault', 'الهامش الافتراضي', '×', '0.3 = 30%');
+    h += numField('minOrder', 'الحد الأدنى للطلب', 'ر.س');
+    h += numField('vat', 'ضريبة القيمة المضافة', '×', '0.15 = 15%');
+    h += numField('turnIn', 'مدة التنفيذ', 'يوم', 'تظهر في عرض السعر');
+    h += numField('validDays', 'صلاحية العرض', 'يوم');
+    h += '</div>';
+    h += '<b style="font-size:13px;display:block;margin-top:10px">شرائح الهامش حسب الكمية</b>';
+    h += listEd('tiers', [{ k: 'min', suf: 'قطعة', w: 120 }, { k: 'margin', suf: '×', w: 110 }], 'الهامش يُضاف فوق التكلفة: 0.5 = 50%', 'إضافة شريحة');
+
+    h += '<div class="sep"></div><h3 class="sec">٦ · بيانات المنشأة (في عرض السعر)</h3><div class="grid2">';
+    h += '<div class="field"><label>الاسم</label><input data-s="company.name" value="' + esc(S.company.name) + '"></div>';
+    h += '<div class="field"><label>الجوال</label><input data-s="company.phone" value="' + esc(S.company.phone) + '"></div>';
+    h += '<div class="field"><label>الرقم الضريبي</label><input data-s="company.vatNo" value="' + esc(S.company.vatNo) + '"></div>';
+    h += '<div class="field"><label>العنوان</label><input data-s="company.address" value="' + esc(S.company.address) + '"></div>';
+    h += '<div class="field full"><label>شروط وملاحظات العرض</label><textarea data-s="company.terms" style="width:100%;height:80px;border:1px solid var(--line);border-radius:9px;padding:9px">' + esc(S.company.terms || 'الأسعار غير شاملة أي رسوم إضافية غير مذكورة صراحة.\nيُرجى تأكيد الطلب كتابياً لبدء التنفيذ.\nطريقة الدفع: 100% مقدماً.') + '</textarea></div>';
+    h += '</div>';
+
+    h += '<div class="sep"></div><h3 class="sec">٧ · علب الهارد كفر — تكاليف ورقة «التكاليف»</h3>';
+    h += '<p class="note" style="margin:0 0 10px">كل القيم بالريال. القيم الافتراضية مأخوذة من حاسبة الإكسل المعتمدة وهي تقديرية — استبدلها بعروض مورديك وتكاليف وقت التشغيل الفعلية.</p>';
+    h += '<b style="font-size:13px">الخامات والطباعة (لكل متر مربع)</b><div class="grid3" style="margin-top:8px">';
+    h += numField('boxCost.board', 'لوح رمادي صلب', 'ر.س/م²');
+    h += numField('boxCost.wrapPaper', 'ورق تغليف خارجي', 'ر.س/م²');
+    h += numField('boxCost.print', 'طباعة خارجية', 'ر.س/م²');
+    h += numField('boxCost.lam', 'لامينيشن خارجي', 'ر.س/م²');
+    h += numField('boxCost.lining', 'ورق بطانة داخلية', 'ر.س/م²');
+    h += numField('boxCost.innerPrint', 'طباعة داخلية', 'ر.س/م²');
+    h += numField('boxCost.fabric', 'قماش/خامة بطانة', 'ر.س/م²');
+    h += '</div>';
+    h += '<b style="font-size:13px;display:block;margin-top:12px">الحشوات والإغلاقات (لكل قطعة/متر)</b><div class="grid3" style="margin-top:8px">';
+    h += numField('boxCost.eva', 'حشوة EVA أو فوم', 'ر.س/قطعة');
+    h += numField('boxCost.divider', 'فاصل/حامل كرتوني', 'ر.س/قطعة');
+    h += numField('boxCost.magnet', 'مغناطيس إغلاق', 'ر.س/قطعة');
+    h += numField('boxCost.ribbon', 'شريط سحب/ربطة', 'ر.س/متر');
+    h += '</div>';
+    h += '<b style="font-size:13px;display:block;margin-top:12px">التشطيبات والتشغيل (لكل علبة)</b><div class="grid3" style="margin-top:8px">';
+    h += numField('boxCost.foil', 'فويل ساخن', 'ر.س/موضع');
+    h += numField('boxCost.emboss', 'بروز أو حفر', 'ر.س/موضع');
+    h += numField('boxCost.uv', 'UV موضعي', 'ر.س/موضع');
+    h += numField('boxCost.assembly', 'تجميع يدوي', 'ر.س/علبة');
+    h += numField('boxCost.qc', 'فحص الجودة', 'ر.س/علبة');
+    h += numField('boxCost.glue', 'غراء ولوازم', 'ر.س/علبة');
+    h += numField('boxCost.packUnit', 'تغليف فردي/كرتون', 'ر.س/وحدة');
+    h += numField('boxCost.cut', 'قص وتخديد وتحويل', 'ر.س/علبة');
+    h += numField('boxCost.otherSvc', 'خدمة إضافية أخرى', 'ر.س/علبة');
+    h += '</div>';
+    h += '<b style="font-size:13px;display:block;margin-top:12px">رسوم ثابتة لكل طلب</b><div class="grid3" style="margin-top:8px">';
+    h += numField('boxCost.fDesign', 'تصميم هيكل وتجهيز ملف', 'ر.س/طلب');
+    h += numField('boxCost.fSample', 'عينة أو نموذج أولي', 'ر.س/طلب');
+    h += numField('boxCost.fPrintSetup', 'إعداد الطباعة/بروفة اللون', 'ر.س/طلب');
+    h += numField('boxCost.fDie', 'قالب قص أو إعداد هيكل', 'ر.س/طلب');
+    h += numField('boxCost.fFoilDie', 'كليشيه الفويل', 'ر.س/طلب');
+    h += numField('boxCost.fEmbossDie', 'قالب البروز/الحفر', 'ر.س/طلب');
+    h += numField('boxCost.fUvSetup', 'إعداد UV موضعي', 'ر.س/طلب');
+    h += numField('boxCost.fDelivery', 'توصيل الطلب', 'ر.س/طلب');
+    h += numField('boxCost.fOther', 'رسوم ثابتة أخرى', 'ر.س/طلب');
+    h += '</div>';
+    h += '<b style="font-size:13px;display:block;margin-top:12px">التسعير والضريبة</b><div class="grid3" style="margin-top:8px">';
+    h += numField('boxCost.overheadPct', 'تحميل التكاليف غير المباشرة', '×', '0.15 = 15% من التكلفة المباشرة');
+    h += numField('boxCost.commissionPct', 'عمولة البيع أو بوابة الدفع', '×', 'نسبة من صافي البيع');
+    h += numField('boxCost.marginPct', 'هامش الربح الإجمالي المستهدف', '×', 'نسبة من صافي البيع — مش زيادة على التكلفة');
+    h += numField('boxCost.vat', 'ضريبة القيمة المضافة', '×', '0.15 = 15%');
+    h += '</div>';
+    $('#setBody').innerHTML = h;
+  }
+
+  /* ---------- عرض السعر ---------- */
+  function quoteHtml() {
+    var it = ST.items[ST.sec], S = ST.settings, r = lastRes || PPC.compute(ST.sec, it, S);
+    var showVat = it.vatShow !== false, co = S.company || {};
+    var vat = r2(r.final * num(S.vat)), total = showVat ? r2(r.final + vat) : r.final;
+    var d = new Date(), mm = String(d.getMonth() + 1).padStart(2, '0');
+    var no = 'Q-' + String(d.getFullYear()).slice(2) + mm + String(d.getDate()).padStart(2, '0') + '-' + String(ST.quoteSeq).padStart(3, '0');
+    var h = '<div class="ph"><div><h1>عرض سعر</h1><div class="co">رقم العرض: ' + esc(no) + '<br>التاريخ: ' + esc(today()) + '</div></div>';
+    h += '<div class="co" style="text-align:left"><b>' + esc(co.name || '') + '</b><br>' + esc(co.address || '') + '<br>جوال: ' + esc(co.phone || '') + '<br>الرقم الضريبي: ' + esc(co.vatNo || '') + '</div></div>';
+    h += '<table><tbody>';
+    h += '<tr><th style="width:32%">العميل</th><td>' + esc(it.client || '—') + '</td></tr>';
+    h += '<tr><th>البيان</th><td>' + esc(PPC.describe(ST.sec, it, S)) + '</td></tr>';
+    h += '<tr><th>الكمية</th><td>' + fmt(r.qty, 0) + '</td></tr>';
+    h += '<tr><th>سعر الوحدة (قبل الضريبة)</th><td class="n">' + fmt(r.unit) + ' ر.س</td></tr>';
+    h += '<tr><th>الإجمالي قبل الضريبة</th><td class="n">' + fmt(r.final) + ' ر.س</td></tr>';
+    if (showVat) {
+      h += '<tr><th>ضريبة القيمة المضافة ' + fmt(num(S.vat) * 100, 0) + '%</th><td class="n">' + fmt(vat) + ' ر.س</td></tr>';
+      h += '<tr class="tot"><th>الإجمالي شامل الضريبة</th><td class="n">' + fmt(total) + ' ر.س</td></tr>';
+    }
+    h += '</tbody></table>';
+    h += '<div class="ft">مدة التنفيذ: ' + fmt(num(S.turnIn), 0) + ' يوم عمل · العرض ساري ' + fmt(num(S.validDays), 0) + ' يوم من تاريخه.<br>';
+    h += esc(co.terms || '').replace(/\n/g, '<br>') + '</div>';
+    return { html: h, no: no };
+  }
+  function doQuote() {
+    var q = quoteHtml();
+    $('#printArea').innerHTML = q.html;
+    ST.quoteSeq++; save();
+    window.print();
+  }
+  function copySummary() {
+    var it = ST.items[ST.sec], S = ST.settings, r = lastRes;
+    if (!r) return;
+    var vat = r2(r.final * num(S.vat));
+    var txt = 'عرض سعر — ' + (it.client || '') + '\n' + PPC.describe(ST.sec, it, S) +
+      '\nالكمية: ' + fmt(r.qty, 0) + ' · سعر الوحدة: ' + fmt(r.unit) + ' ر.س' +
+      '\nالإجمالي: ' + fmt(r.final) + ' ر.س' + (it.vatShow !== false ? ' + ضريبة ' + fmt(vat) + ' = ' + fmt(r.final + vat) + ' ر.س' : '');
+    var done = function () { toast('تم نسخ الملخص'); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, function () { fallbackCopy(txt, done); });
+    else fallbackCopy(txt, done);
+  }
+  function fallbackCopy(txt, cb) {
+    var ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); cb(); } catch (e) { alert(txt); }
+    document.body.removeChild(ta);
+  }
+
+  /* ---------- النسخ الاحتياطي ---------- */
+  function openJson(mode) {
+    $('#jsonTitle').textContent = mode === 'backup' ? 'نسخة احتياطية (أسعار + بيانات النماذج)' : 'استعادة من نسخة احتياطية';
+    $('#jsonNote').textContent = mode === 'backup' ? 'انسخ النص واحفظه — أو الصقه في أي جهاز آخر عبر «استعادة».' : 'الصق نص النسخة الاحتياطية ثم اضغط «تنفيذ».';
+    $('#jsonGo').setAttribute('data-mode', mode);
+    $('#jsonBox').value = mode === 'backup' ? JSON.stringify({ settings: ST.settings, items: ST.items, quoteSeq: ST.quoteSeq }, null, 1) : '';
+    $('#jsonDlg').showModal();
+    if (mode === 'backup') { $('#jsonBox').select(); try { document.execCommand('copy'); toast('تم نسخ النسخة الاحتياطية'); } catch (e) { } }
+  }
+
+  /* ---------- الأحداث ---------- */
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    var act = b.getAttribute('data-act');
+    if (b.getAttribute('data-tab')) {
+      readForm(); ST.sec = b.getAttribute('data-tab'); save(); renderTabs(); renderForm(); renderResult(); return;
+    }
+    if (b.parentNode && b.parentNode.getAttribute && b.parentNode.getAttribute('data-seg')) {
+      var key = b.parentNode.getAttribute('data-seg'), it = ST.items[ST.sec];
+      readForm();
+      var raw = b.getAttribute('data-v');
+      it[key] = (raw === 'true') ? true : (raw === 'false') ? false : (isFinite(raw) && raw !== '' ? Number(raw) : raw);
+      $$('[data-seg="' + key + '"] button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      save(); renderResult();
+      if (key === 'boxType' || key === 'foldType' || key === 'marginMode' || key === 'costMode') renderForm();
+      return;
+    }
+    if (act === 'settings') { renderSettings(); $('#setDlg').showModal(); return; }
+    if (act === 'closeDlg') { $('#setDlg').close(); save(); renderResult(); return; }
+    if (act === 'closeJson') { $('#jsonDlg').close(); return; }
+    if (act === 'jsonGo') {
+      var mode = b.getAttribute('data-mode');
+      if (mode === 'backup') { $('#jsonDlg').close(); return; }
+      try {
+        var d = JSON.parse($('#jsonBox').value);
+        if (!d || typeof d !== 'object') throw 0;
+        if (d.settings) ST.settings = PPC.settings(d.settings);
+        if (d.items) ST.items = Object.assign(JSON.parse(JSON.stringify(DEFITEM)), d.items);
+        if (d.quoteSeq) ST.quoteSeq = d.quoteSeq;
+        save(); renderForm(); renderResult(); $('#jsonDlg').close(); toast('تمت الاستعادة');
+      } catch (err) { toast('النص غير صالح'); }
+      return;
+    }
+    if (act === 'backup') { openJson('backup'); return; }
+    if (act === 'restore') { openJson('restore'); return; }
+    if (act === 'reset') {
+      if (!confirm('استرجاع الأسعار الافتراضية وحذف تعديلاتك؟')) return;
+      ST.settings = PPC.settings(null); ST.items = JSON.parse(JSON.stringify(DEFITEM));
+      save(); renderForm(); renderResult(); if ($('#setDlg').open) renderSettings(); toast('تم استرجاع الافتراضي');
+      return;
+    }
+    if (act === 'addExtra') { readForm(); ST.items[ST.sec].extras.push({ name: '', price: '' }); save(); renderForm(); return; }
+    if (act === 'delExtra') { readForm(); ST.items[ST.sec].extras.splice(+b.getAttribute('data-i'), 1); save(); renderForm(); renderResult(); return; }
+    if (act === 'addRow') {
+      var k = b.getAttribute('data-key');
+      var blank = { sheets: { name: 'فرخ جديد', L: 70, W: 100, edge: 0.5, bleed: 0.3, clickColor: 0.1, clickBw: 0.04, plate: 0, longL: 0, longW: 0, longClick: 1 }, papers: { name: 'ورق جديد', price: 0.5, gsm: 150 }, lams: { name: 'سلوفان جديد', price: 0.6 }, binds: { name: 'تجليد جديد', price: 1 }, handles: { name: 'يد جديدة', price: 0.3 }, tiers: { min: 1, margin: 0.5 } }[k];
+      ST.settings[k] = (ST.settings[k] || []).concat([JSON.parse(JSON.stringify(blank))]);
+      save(); renderSettings(); renderResult(); return;
+    }
+    if (act === 'delRow') {
+      var kk = b.getAttribute('data-key'), i = +b.getAttribute('data-i');
+      if ((ST.settings[kk] || []).length <= 1) { toast('لازم يبقى عنصر واحد على الأقل'); return; }
+      ST.settings[kk].splice(i, 1); save(); renderSettings(); renderResult(); return;
+    }
+    if (act === 'quote') { readForm(); renderResult(); doQuote(); return; }
+    if (act === 'copy') { readForm(); renderResult(); copySummary(); return; }
+  });
+
+  document.addEventListener('input', function (e) {
+    var el = e.target;
+    if (!el || !el.getAttribute) return;
+    if (el.closest('#formBody')) {
+      if (el.getAttribute('data-f')) {
+        var k = el.getAttribute('data-f');
+        if (k === 'size') { applySize(); return; }
+        if (k === 'boxType' || k === 'foldType') { readForm(); save(); renderForm(); renderResult(); return; }
+      }
+      render(); return;
+    }
+    if (el.closest('#setBody') && el.getAttribute('data-s')) {
+      var p = el.getAttribute('data-s');
+      var v = el.type === 'checkbox' ? el.checked : el.value;
+      setPath(ST.settings, p, v);
+      save(); renderResult(); return;
+    }
+    if (el.getAttribute && el.getAttribute('data-f2') === 'vatShow') {
+      ST.items[ST.sec].vatShow = el.checked; save(); return;
+    }
+  });
+  document.addEventListener('change', function (e) {
+    var el = e.target;
+    if (!el || !el.getAttribute) return;
+    if (el.getAttribute && el.getAttribute('data-f2') === 'vatShow') { ST.items[ST.sec].vatShow = el.checked; save(); return; }
+    if (el.closest('#formBody')) {
+      var k = el.getAttribute('data-f');
+      if (k === 'size') { applySize(); return; }
+      if (k === 'manualBlank' || k === 'holder' || k === 'boxType' || k === 'foldType') {
+        readForm(); save(); renderForm(); renderResult(); return;
+      }
+      render();
+      return;
+    }
+    if (el.closest('#setBody')) { save(); renderResult(); return; }
+  });
+
+  /* ---------- تشغيل ---------- */
+  renderTabs(); renderForm(); renderResult();
+  window.PPC_APP = { ST: ST, render: renderResult };
+})();
+</script>
+
+</body>
+</html>
